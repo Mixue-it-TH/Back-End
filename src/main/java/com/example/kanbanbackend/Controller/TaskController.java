@@ -18,6 +18,7 @@ public class TaskController {
         return ResponseEntity.ok(service.getAllTodo());
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTaskById(@PathVariable Integer id){
         return ResponseEntity.ok(service.getTaskById(id));
