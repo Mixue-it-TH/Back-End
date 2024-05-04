@@ -4,6 +4,7 @@ import com.example.kanbanbackend.DTO.TaskDTO;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,8 @@ public class TaskController {
 
     @PostMapping("")
     public ResponseEntity<Object> addTask(@RequestBody Task newTask){
-        return ResponseEntity.ok(service.createTask(newTask));
+        ;
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createTask(newTask)   );
     }
 
     @PutMapping("/{id}")

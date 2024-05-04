@@ -63,7 +63,7 @@ public class TaskService {
     }
 
     public TaskDTO updateTask(Integer taskId, Task editedTask ){//เดี๋ยวกลับมาแก้ปัญหาเรื่อง null เวลา createOn updateOn
-        Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "I don't have this shit " + taskId));
+        Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         oldTask.setId(editedTask.getId());
         oldTask.setTaskTitle(editedTask.getTaskTitle());
         oldTask.setTaskAssignees(editedTask.getTaskAssignees());
@@ -81,7 +81,7 @@ public class TaskService {
     }
 
     public TaskDTO getTaskByIdForDel(Integer id){
-         Task task = repository.findById(id).orElseThrow(() -> new ItemNotFoundDelUpdate( "I don't have this shit " + id));
+         Task task = repository.findById(id).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
          return mapper.map(task, TaskDTO.class);
     }
 }
