@@ -63,6 +63,7 @@ public class TaskService {
     }
 
     public TaskDTO updateTask(Integer taskId, Task editedTask ){//เดี๋ยวกลับมาแก้ปัญหาเรื่อง null เวลา createOn updateOn
+        System.out.println(editedTask);
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "I don't have this shit " + taskId));
         oldTask.setId(editedTask.getId());
         oldTask.setTaskTitle(editedTask.getTaskTitle());
@@ -70,6 +71,7 @@ public class TaskService {
         oldTask.setTaskStatus(editedTask.getTaskStatus());
         oldTask.setTaskDescription(editedTask.getTaskDescription());
         oldTask.setCreatedOn(oldTask.getCreatedOn());
+        System.out.println(oldTask);
 //        oldTask.setUpdatedOn(formattedDate);
         repository.save(oldTask);
         return mapper.map(oldTask, TaskDTO.class);
