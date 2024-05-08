@@ -1,10 +1,12 @@
 package com.example.kanbanbackend.Controller;
 
+import com.example.kanbanbackend.DTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.TaskDTO;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Service.TaskService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class TaskController {
     @Autowired
     private TaskService service;
+
+    @Autowired
+    private ModelMapper mapper;
 
 
     @GetMapping("")
@@ -28,12 +33,13 @@ public class TaskController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> addTask(@RequestBody Task newTask){
-        return ResponseEntity.ok(service.createTask(newTask));
+    public ResponseEntity<Object> addTask(@RequestBody TaskAddEditDTO newTaskDTO){
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createTask(newTaskDTO)   );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateTask(@PathVariable Integer id, @RequestBody Task editedTask){
+    public ResponseEntity<Object> updateTask(@PathVariable Integer id, @RequestBody TaskAddEditDTO editedTask){
         return ResponseEntity.ok(service.updateTask(id, editedTask));
     }
 
