@@ -70,7 +70,7 @@ public class TaskService {
         return mapper.map(task,TaskAddEditDTO.class);
     }
 
-    public TaskDTO updateTask(Integer taskId, Task editedTask ){
+    public TaskDTO updateTask(Integer taskId, TaskAddEditDTO editedTask ){
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         oldTask.setId(editedTask.getId() != null ? editedTask.getId() : oldTask.getId());
         oldTask.setTaskTitle(editedTask.getTaskTitle() != null ? editedTask.getTaskTitle() : oldTask.getTaskTitle());
