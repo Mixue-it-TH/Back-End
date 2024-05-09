@@ -1,17 +1,15 @@
 package com.example.kanbanbackend.DTO;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class TaskDTO {
+public class TaskAddEditDTO {
     private Integer id;
 
     @JsonProperty("title")
     private String taskTitle;
 
-    @JsonIgnore
     @JsonProperty("description")
     private String taskDescription;
 
@@ -20,6 +18,5 @@ public class TaskDTO {
 
     @JsonProperty("status")
     private String taskStatus;
-
 
 }
