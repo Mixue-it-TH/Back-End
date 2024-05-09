@@ -72,6 +72,15 @@ public class TaskService {
 
     public TaskDTO updateTask(Integer taskId, TaskAddEditDTO editedTask ){
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
+        Optional.ofNullable(editedTask.getTaskTitle())
+                .map(String::trim)
+                .ifPresent(editedTask::setTaskTitle);
+        Optional.ofNullable(editedTask.getTaskDescription())
+                .map(String::trim)
+                .ifPresent(editedTask::setTaskDescription);
+        Optional.ofNullable(editedTask.getTaskAssignees())
+                .map(String::trim)
+                .ifPresent(editedTask::setTaskAssignees);
         oldTask.setId(editedTask.getId() != null ? editedTask.getId() : oldTask.getId());
         oldTask.setTaskTitle(editedTask.getTaskTitle() != null ? editedTask.getTaskTitle() : oldTask.getTaskTitle());
         oldTask.setTaskAssignees(editedTask.getTaskAssignees() != null ? editedTask.getTaskAssignees() : oldTask.getTaskAssignees());
