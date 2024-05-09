@@ -35,7 +35,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateTask(@PathVariable Integer id, @RequestBody Task editedTask){
+    public ResponseEntity<Object> updateTask(@PathVariable Integer id, @RequestBody TaskAddEditDTO editedTask){
         return ResponseEntity.ok(service.updateTask(id, editedTask));
     }
 
