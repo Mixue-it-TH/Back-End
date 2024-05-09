@@ -35,9 +35,8 @@ public class TaskService {
     }
 
     public TaskSelectedDTO getTaskById(int id) throws ItemNotFoundException {
-//        System.out.println(id);
         Task task =  repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Task "+ id +" does not exist !!!" ));
-        System.out.println(task);
+
         LocalDateTime createdDateTime = LocalDateTime.parse(task.getCreatedOn(), DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT));
         LocalDateTime updatedDateTime = LocalDateTime.parse(task.getUpdatedOn(), DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT));
 
@@ -51,37 +50,35 @@ public class TaskService {
         task.setUpdatedOn(DateTimeFormatter.ISO_INSTANT.format(updatedUTC));
 
         return mapper.map(task, TaskSelectedDTO.class);
-
-
     }
 
-    public TaskAddEditDTO createTask(TaskAddEditDTO newTaskDTO){
-        Task newTask = mapper.map(newTaskDTO,Task.class);
-        System.out.println(newTask);
-//        if(newTask.getTaskStatus() == null || newTask.getTaskStatus().isBlank()){
-//            newTask.setTaskStatus("NO_STATUS");
-//        }
-        Optional.ofNullable(newTask.getTaskTitle())
+    public TaskAddEditDTO createTask(TaskAddEditDTO newTask){
+        Task task = mapper.map(newTask,Task.class);
+        if(task.getTaskStatus() == null || task.getTaskStatus().isBlank()){
+            task.setTaskStatus("NO_STATUS");
+        }
+        Optional.ofNullable(task.getTaskTitle())
                 .map(String::trim)
-                .ifPresent(newTask::setTaskTitle);
-        Optional.ofNullable(newTask.getTaskDescription())
+                .ifPresent(task::setTaskTitle);
+        Optional.ofNullable(task.getTaskDescription())
                 .map(String::trim)
-                .ifPresent(newTask::setTaskDescription);
-        Optional.ofNullable(newTask.getTaskAssignees())
+                .ifPresent(task::setTaskDescription);
+        Optional.ofNullable(task.getTaskAssignees())
                 .map(String::trim)
-                .ifPresent(newTask::setTaskAssignees);
-        repository.saveAndFlush(newTask);
-        return mapper.map(newTask, TaskAddEditDTO.class);
+                .ifPresent(task::setTaskAssignees);
+        repository.saveAndFlush(task);
+        return mapper.map(task,TaskAddEditDTO.class);
     }
 
-    public TaskDTO updateTask(Integer taskId, TaskAddEditDTO editedTask ){
+    public TaskDTO updateTask(Integer taskId, Task editedTask ){
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         oldTask.setId(editedTask.getId() != null ? editedTask.getId() : oldTask.getId());
         oldTask.setTaskTitle(editedTask.getTaskTitle() != null ? editedTask.getTaskTitle() : oldTask.getTaskTitle());
         oldTask.setTaskAssignees(editedTask.getTaskAssignees() != null ? editedTask.getTaskAssignees() : oldTask.getTaskAssignees());
-        oldTask.setTaskStatus(editedTask.getTaskStatusId() != null ? editedTask.getTaskStatusId() : oldTask.getTaskStatus());
+        oldTask.setTaskStatus(editedTask.getTaskStatus() != null ? editedTask.getTaskStatus() : oldTask.getTaskStatus());
         oldTask.setTaskDescription(editedTask.getTaskDescription() != null ? editedTask.getTaskDescription() : oldTask.getTaskDescription());
         System.out.println(oldTask);
+//        oldTask.setUpdatedOn(formattedDate);
         repository.save(oldTask);
         return mapper.map(oldTask, TaskDTO.class);
     }
@@ -92,9 +89,7 @@ public class TaskService {
     }
 
     public TaskDTO getTaskByIdForDel(Integer id){
-         Task task = repository.findById(id).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
+         Task task = repository.findById(id).orElseThrow(() -> new ItemNotFoundDelUpdate( "I don't have this shit " + id));
          return mapper.map(task, TaskDTO.class);
     }
-
-
 }

@@ -1,6 +1,5 @@
 package com.example.kanbanbackend.DTO;
 
-import com.example.kanbanbackend.Entitites.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -18,6 +17,6 @@ public class TaskAddEditDTO {
     private String taskAssignees;
 
     @JsonProperty("status")
-    private Status taskStatusId;
+    private String taskStatus;
 
 }
