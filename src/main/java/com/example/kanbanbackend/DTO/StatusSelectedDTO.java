@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class StatusDTO {
+public class StatusSelectedDTO {
     private Integer id;
 
     @JsonProperty("name")
@@ -17,5 +17,6 @@ public class StatusDTO {
     @JsonProperty("statusColor")
     private String statusColor;
 
-
+    private String createdOn;
+    private String updatedOn;
 }

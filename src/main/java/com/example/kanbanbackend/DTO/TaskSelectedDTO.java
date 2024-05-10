@@ -14,7 +14,7 @@ public class TaskSelectedDTO {
     @JsonProperty("assignees")
     private String taskAssignees;
     @JsonProperty("status")
-    private String taskStatusName;
+    private StatusListAllTaskDTO taskStatus;
     private String createdOn;
     private String updatedOn;
 

@@ -1,9 +1,11 @@
 package com.example.kanbanbackend.Service;
 
 
+import com.example.kanbanbackend.DTO.StatusSelectedDTO;
 import com.example.kanbanbackend.DTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.TaskDTO;
 import com.example.kanbanbackend.DTO.TaskSelectedDTO;
+import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Exception.ItemNotFoundDelUpdate;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
@@ -29,6 +31,9 @@ public class TaskService {
     @Autowired
     private TaskRepository repository;
 
+    @Autowired
+    private StatusService statusService;
+
     public List<TaskDTO> getAllTodo(){
         List<Task> tasks = repository.findAll();
         return  listMapper.mapList(tasks,TaskDTO.class);
@@ -36,6 +41,7 @@ public class TaskService {
 
     public TaskSelectedDTO getTaskById(int id) throws ItemNotFoundException {
 //        System.out.println(id);
+        System.out.println("=====================");
         Task task =  repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Task "+ id +" does not exist !!!" ));
         System.out.println(task);
         LocalDateTime createdDateTime = LocalDateTime.parse(task.getCreatedOn(), DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT));
@@ -55,12 +61,9 @@ public class TaskService {
 
     }
 
-    public TaskAddEditDTO createTask(TaskAddEditDTO newTaskDTO){
+    public TaskDTO createTask(TaskAddEditDTO newTaskDTO){
         Task newTask = mapper.map(newTaskDTO,Task.class);
         System.out.println(newTask);
-//        if(newTask.getTaskStatus() == null || newTask.getTaskStatus().isBlank()){
-//            newTask.setTaskStatus("NO_STATUS");
-//        }
         Optional.ofNullable(newTask.getTaskTitle())
                 .map(String::trim)
                 .ifPresent(newTask::setTaskTitle);
@@ -71,18 +74,36 @@ public class TaskService {
                 .map(String::trim)
                 .ifPresent(newTask::setTaskAssignees);
         repository.saveAndFlush(newTask);
-        return mapper.map(newTask, TaskAddEditDTO.class);
+        StatusSelectedDTO newStatus = statusService.getStatusById(newTask.getTaskStatus().getId());
+        Status status = mapper.map(newStatus,Status.class);
+        newTask.setTaskStatus(status);
+        return mapper.map(newTask, TaskDTO.class);
     }
 
     public TaskDTO updateTask(Integer taskId, TaskAddEditDTO editedTask ){
+        System.out.println(editedTask);
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
+        System.out.println("hahaxd "+oldTask);
+        Optional.ofNullable(editedTask.getTaskTitle())
+                .map(String::trim)
+                .ifPresent(editedTask::setTaskTitle);
+        Optional.ofNullable(editedTask.getTaskDescription())
+                .map(String::trim)
+                .ifPresent(editedTask::setTaskDescription);
+        Optional.ofNullable(editedTask.getTaskAssignees())
+                .map(String::trim)
+                .ifPresent(editedTask::setTaskAssignees);
         oldTask.setId(editedTask.getId() != null ? editedTask.getId() : oldTask.getId());
         oldTask.setTaskTitle(editedTask.getTaskTitle() != null ? editedTask.getTaskTitle() : oldTask.getTaskTitle());
         oldTask.setTaskAssignees(editedTask.getTaskAssignees() != null ? editedTask.getTaskAssignees() : oldTask.getTaskAssignees());
         oldTask.setTaskStatus(editedTask.getTaskStatusId() != null ? editedTask.getTaskStatusId() : oldTask.getTaskStatus());
         oldTask.setTaskDescription(editedTask.getTaskDescription() != null ? editedTask.getTaskDescription() : oldTask.getTaskDescription());
-        System.out.println(oldTask);
         repository.save(oldTask);
+        StatusSelectedDTO newStatus = statusService.getStatusById(oldTask.getTaskStatus().getId());
+        Status status = mapper.map(newStatus,Status.class);
+        System.out.println(status);
+        oldTask.setTaskStatus(status);
+        System.out.println(oldTask);
         return mapper.map(oldTask, TaskDTO.class);
     }
 

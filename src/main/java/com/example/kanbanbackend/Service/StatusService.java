@@ -1,6 +1,7 @@
 package com.example.kanbanbackend.Service;
 
 import com.example.kanbanbackend.DTO.StatusDTO;
+import com.example.kanbanbackend.DTO.StatusSelectedDTO;
 import com.example.kanbanbackend.DTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.TaskDTO;
 import com.example.kanbanbackend.Entitites.Status;
@@ -32,13 +33,15 @@ public class StatusService {
         List<Status> status = repository.findAll();
         return  listMapper.mapList(status,StatusDTO.class);
     }
-    public StatusDTO getStatusById(int id){
+    public StatusSelectedDTO getStatusById(int id){
         Status status = repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Status "+ id +" does not exist !!!" ));
-        return mapper.map(status,StatusDTO.class);
+        return mapper.map(status,StatusSelectedDTO.class);
     }
     public StatusDTO createStatus(StatusDTO newStatusDTO){
         Status status = mapper.map(newStatusDTO,Status.class);
-        System.out.println(status);
+        if(status.getStatusColor() == null || status.getStatusColor().isBlank()){
+            status.setStatusColor("#6b7280");
+        }
         Optional.ofNullable(status.getStatusName())
                 .map(String::trim)
                 .ifPresent(status::setStatusName);

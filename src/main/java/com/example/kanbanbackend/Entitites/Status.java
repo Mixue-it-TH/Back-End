@@ -19,4 +19,13 @@ public class Status {
 
     @Column(name = "statusDescription")
     private String statusDescription;
+
+    @Column(name = "statusColor")
+    private String statusColor;
+
+    @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
+    private String createdOn;
+
+    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
+    private String updatedOn;
 }
