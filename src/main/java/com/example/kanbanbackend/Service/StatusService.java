@@ -55,6 +55,7 @@ public class StatusService {
        Status oldStatus = repository.findById(statusId).orElseThrow(() -> new ItemNotFoundDelUpdate(" NOT FOUND "));
         oldStatus.setStatusName(editedStatus.getStatusName() != null ? editedStatus.getStatusName() : oldStatus.getStatusName());
         oldStatus.setStatusDescription(editedStatus.getStatusDescription() != null ? editedStatus.getStatusDescription() : oldStatus.getStatusDescription());
+        oldStatus.setStatusColor(editedStatus.getStatusColor() != null ? editedStatus.getStatusColor() : oldStatus.getStatusColor());   
         repository.save(oldStatus);
         return mapper.map(oldStatus, StatusDTO.class);
     }
