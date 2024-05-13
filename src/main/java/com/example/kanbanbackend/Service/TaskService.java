@@ -1,14 +1,12 @@
 package com.example.kanbanbackend.Service;
 
 
-import com.example.kanbanbackend.DTO.StatusSelectedDTO;
-import com.example.kanbanbackend.DTO.TaskAddEditDTO;
-import com.example.kanbanbackend.DTO.TaskDTO;
-import com.example.kanbanbackend.DTO.TaskSelectedDTO;
+import com.example.kanbanbackend.DTO.*;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Exception.ItemNotFoundDelUpdate;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
+import com.example.kanbanbackend.Repository.StatusRepository;
 import com.example.kanbanbackend.Repository.TaskRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,9 @@ public class TaskService {
     private TaskRepository repository;
 
     @Autowired
+    private StatusRepository statusRepository;
+
+    @Autowired
     private StatusService statusService;
 
     public List<TaskDTO> getAllTodo(){
@@ -50,8 +51,7 @@ public class TaskService {
         ZonedDateTime createdUTC = createdDateTime.atZone(ZoneOffset.UTC);
         ZonedDateTime updatedUTC = updatedDateTime.atZone(ZoneOffset.UTC);
 
-        System.out.println(createdUTC);
-        System.out.println(updatedUTC);
+
 
         task.setCreatedOn(DateTimeFormatter.ISO_INSTANT.format(createdUTC));
         task.setUpdatedOn(DateTimeFormatter.ISO_INSTANT.format(updatedUTC));
@@ -61,26 +61,31 @@ public class TaskService {
 
     }
 
-    public TaskDTO createTask(TaskAddEditDTO newTaskDTO){
+    public TaskDTO createTask(TaskAddDTO newTaskDTO){
+        Status statusfind = statusRepository.findById(newTaskDTO.getTaskStatusId()).orElseThrow(() -> new ItemNotFoundException("Status "+ newTaskDTO.getTaskStatusId() +" does not exist !!!" ));
         Task newTask = mapper.map(newTaskDTO,Task.class);
         System.out.println(newTask);
-        Optional.ofNullable(newTask.getTaskTitle())
-                .map(String::trim)
-                .ifPresent(newTask::setTaskTitle);
-        Optional.ofNullable(newTask.getTaskDescription())
-                .map(String::trim)
-                .ifPresent(newTask::setTaskDescription);
-        Optional.ofNullable(newTask.getTaskAssignees())
-                .map(String::trim)
-                .ifPresent(newTask::setTaskAssignees);
+        System.out.println("newTaskDTO: " + newTaskDTO);
+        newTask.setTaskTitle(newTaskDTO.getTaskTitle() == null ? null : newTaskDTO.getTaskTitle().trim());
+        newTask.setTaskDescription(newTaskDTO.getTaskDescription() == null || newTaskDTO.getTaskDescription().isEmpty()  ? null  : newTaskDTO.getTaskDescription().trim());
+        newTask.setTaskAssignees(newTaskDTO.getTaskAssignees() == null || newTaskDTO.getTaskAssignees().isEmpty() ? null : newTaskDTO.getTaskAssignees().trim());
+//        Optional.ofNullable(newTask.getTaskTitle())
+//                .map(String::trim)
+//                .ifPresent(newTask::setTaskTitle);
+//        Optional.ofNullable(newTask.getTaskDescription())
+//                .map(String::trim)
+//                .ifPresent(newTask::setTaskDescription);
+//        Optional.ofNullable(newTask.getTaskAssignees())
+//                .map(String::trim)
+//                .ifPresent(newTask::setTaskAssignees);
         repository.saveAndFlush(newTask);
-        StatusSelectedDTO newStatus = statusService.getStatusById(newTask.getTaskStatus().getId());
-        Status status = mapper.map(newStatus,Status.class);
+        Status status = mapper.map(statusfind,Status.class);
         newTask.setTaskStatus(status);
         return mapper.map(newTask, TaskDTO.class);
     }
 
-    public TaskDTO updateTask(Integer taskId, TaskAddEditDTO editedTask ){
+    public TaskDTO updateTask(Integer taskId, TaskEditDTO editedTask ){
+
         System.out.println(editedTask);
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         System.out.println("hahaxd "+oldTask);

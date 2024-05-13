@@ -1,18 +1,14 @@
 package com.example.kanbanbackend.Controller;
 
 import com.example.kanbanbackend.DTO.StatusDTO;
-import com.example.kanbanbackend.DTO.TaskAddEditDTO;
-import com.example.kanbanbackend.DTO.TaskDTO;
-import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Service.StatusService;
-import com.example.kanbanbackend.Service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173","http://ip23sy2.sit.kmutt.ac.th"})
+@CrossOrigin(origins = {"http://localhost:5173","http://ip23sy2.sit.kmutt.ac.th","https://intproj23.sit.kmutt.ac.th"})
 @RequestMapping("/v2/statuses")
 public class StatusController {
     @Autowired
