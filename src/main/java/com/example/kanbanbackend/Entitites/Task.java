@@ -1,15 +1,14 @@
 package com.example.kanbanbackend.Entitites;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,6 +16,7 @@ import java.sql.Timestamp;
 public class Task {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "taskTitle", nullable = false, length = 100)
@@ -28,12 +28,15 @@ public class Task {
     @Column(name = "taskAssignees", length = 30)
     private String taskAssignees;
 
-    @Column(name = "taskStatus")
-    private String taskStatus;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "taskStatus")
+    private Status taskStatus;
 
-    @Column(name = "createdOn", nullable = false)
+//    private String taskStatus;
+
+    @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
     private String createdOn;
 
-    @Column(name = "updatedOn", nullable = false)
+    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
     private String updatedOn;
 }
