@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173","http://ip23sy2.sit.kmutt.ac.th"})
 @RequestMapping("/v1/tasks")
@@ -22,8 +24,8 @@ public class TaskController {
 
 
     @GetMapping("")
-    public ResponseEntity<Object> getAllTask(){
-        return ResponseEntity.ok(service.getAllTodo());
+    public ResponseEntity<Object> getAllTask(@RequestParam(required = false) List<String> statusName){
+        return ResponseEntity.ok(service.getAllTodo(statusName));
     }
 
 
@@ -34,8 +36,7 @@ public class TaskController {
 
     @PostMapping("")
     public ResponseEntity<Object> addTask(@RequestBody TaskAddEditDTO newTaskDTO){
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.createTask(newTaskDTO)   );
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createTask(newTaskDTO));
     }
 
     @PutMapping("/{id}")

@@ -26,6 +26,8 @@ public class GlobalExceptionHandler {
         delException errorResponse = new delException(Timestamp.from(Instant.now()), HttpStatus.NOT_FOUND.value(), ex.getMessage() , request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+
 }
 
 

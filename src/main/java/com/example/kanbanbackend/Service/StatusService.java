@@ -1,9 +1,6 @@
 package com.example.kanbanbackend.Service;
 
-import com.example.kanbanbackend.DTO.StatusDTO;
-import com.example.kanbanbackend.DTO.StatusSelectedDTO;
-import com.example.kanbanbackend.DTO.TaskAddEditDTO;
-import com.example.kanbanbackend.DTO.TaskDTO;
+import com.example.kanbanbackend.DTO.*;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Exception.ItemNotFoundDelUpdate;
@@ -12,6 +9,7 @@ import com.example.kanbanbackend.Repository.StatusRepository;
 import com.example.kanbanbackend.Repository.TaskRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +28,7 @@ public class StatusService {
     private TaskRepository taskRepository;
 
     public List<StatusDTO> getAllStatus(){
+
         List<Status> status = repository.findAll();
         return  listMapper.mapList(status,StatusDTO.class);
     }
@@ -78,4 +77,6 @@ public class StatusService {
             repository.delete(statusDel);
         }
     }
+
+
 }

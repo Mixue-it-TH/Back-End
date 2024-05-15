@@ -7,9 +7,13 @@ import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Service.StatusService;
 import com.example.kanbanbackend.Service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173","http://ip23sy2.sit.kmutt.ac.th"})
@@ -50,5 +54,8 @@ public class StatusController {
         return ResponseEntity.ok().build();
     }
 
-
+//    @GetMapping("/{id}/maximum-task")
+//    public ResponseEntity<Object> getAllAmountTask(@PathVariable Integer id){
+//            return ResponseEntity.ok(service.ListAllStatus(id));
+//    }
 }

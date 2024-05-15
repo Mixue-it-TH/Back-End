@@ -1,10 +1,7 @@
 package com.example.kanbanbackend.Service;
 
 
-import com.example.kanbanbackend.DTO.StatusSelectedDTO;
-import com.example.kanbanbackend.DTO.TaskAddEditDTO;
-import com.example.kanbanbackend.DTO.TaskDTO;
-import com.example.kanbanbackend.DTO.TaskSelectedDTO;
+import com.example.kanbanbackend.DTO.*;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Exception.ItemNotFoundDelUpdate;
@@ -12,12 +9,14 @@ import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Repository.TaskRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -34,10 +33,11 @@ public class TaskService {
     @Autowired
     private StatusService statusService;
 
-    public List<TaskDTO> getAllTodo(){
-        List<Task> tasks = repository.findAll();
-        return  listMapper.mapList(tasks,TaskDTO.class);
-    }
+//    public List<TaskDTO> getAllTodo(String statusName){
+//
+//        List<Task> tasks = repository.findAll();
+//        return  listMapper.mapList(tasks,TaskDTO.class);
+//    }
 
     public TaskSelectedDTO getTaskById(int id) throws ItemNotFoundException {
 //        System.out.println(id);
@@ -81,6 +81,9 @@ public class TaskService {
     }
 
     public TaskDTO updateTask(Integer taskId, TaskAddEditDTO editedTask ){
+        if(editedTask.getId() == 1 || editedTask.getId() == 4){
+            throw new RuntimeException("You can't edit No Status or Done status");
+        }
         System.out.println(editedTask);
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         System.out.println("hahaxd "+oldTask);
@@ -108,6 +111,9 @@ public class TaskService {
     }
 
     public void deleteTask(Integer delId){
+        if(delId == 1 || delId == 4){
+            throw new RuntimeException("You can't delete No Status or Done status");
+        }
         Task delTask = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate( "He's already gone " + delId));
         repository.delete(delTask);
     }
@@ -117,5 +123,19 @@ public class TaskService {
          return mapper.map(task, TaskDTO.class);
     }
 
+
+    public List<TaskDTO> getAllTodo(List<String> statusName){
+        List<Task> taskList = new ArrayList<>();
+        if(statusName != null){
+            for (String name:statusName
+                 ) {
+                taskList.addAll(repository.findAllByStatusNamesSorted(name)) ;
+            }
+
+            return  listMapper.mapList(taskList, TaskDTO.class);
+        }
+        List<Task> tasks = repository.findAll();
+        return  listMapper.mapList(tasks,TaskDTO.class);
+    }
 
 }
