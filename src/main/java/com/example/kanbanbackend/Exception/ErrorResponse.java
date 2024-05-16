@@ -1,8 +1,12 @@
 package com.example.kanbanbackend.Exception;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+
 
 @Data
+
 public class ErrorResponse {
     private String timestamp;
     private int status;
@@ -17,6 +21,9 @@ public class ErrorResponse {
         this.message = message;
         this.path = path;
     }
+
+
+
 
 }
 

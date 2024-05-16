@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -35,7 +36,21 @@ public class TaskService {
     @Autowired
     private StatusService statusService;
 
-    public List<TaskDTO> getAllTodo(){
+//    public List<TaskDTO> getAllTodo(){
+//        List<Task> tasks = repository.findAll();
+//        return  listMapper.mapList(tasks,TaskDTO.class);
+//    }
+
+    public List<TaskDTO> getAllTodo(List<String> statusName){
+        List<Task> taskList = new ArrayList<>();
+        if(statusName != null){
+            for (String name:statusName
+            ) {
+                taskList.addAll(repository.findAllByStatusNamesSorted(name)) ;
+            }
+
+            return  listMapper.mapList(taskList, TaskDTO.class);
+        }
         List<Task> tasks = repository.findAll();
         return  listMapper.mapList(tasks,TaskDTO.class);
     }

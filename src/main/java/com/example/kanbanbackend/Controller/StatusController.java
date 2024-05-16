@@ -1,7 +1,9 @@
 package com.example.kanbanbackend.Controller;
 
 import com.example.kanbanbackend.DTO.StatusDTO;
+import com.example.kanbanbackend.DTO.StatusEditDTO;
 import com.example.kanbanbackend.Service.StatusService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +27,13 @@ public class StatusController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> addStatus(@RequestBody StatusDTO newStatusDTO){
+    public ResponseEntity<Object> addStatus(@Valid @RequestBody StatusDTO newStatusDTO){
         System.out.println(newStatusDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createStatus(newStatusDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateStatus(@PathVariable Integer id, @RequestBody StatusDTO editedStatus){
+    public ResponseEntity<Object> updateStatus(@Valid @PathVariable Integer id, @Valid @RequestBody StatusEditDTO editedStatus){
         return ResponseEntity.ok(service.updateStatus(id, editedStatus));
     }
 

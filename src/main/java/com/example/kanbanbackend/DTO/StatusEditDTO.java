@@ -1,15 +1,15 @@
 package com.example.kanbanbackend.DTO;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Data
-public class StatusDTO {
+public class StatusEditDTO {
+    @NotNull
     private Integer id;
 
     @JsonProperty("name")
@@ -24,6 +24,4 @@ public class StatusDTO {
 
     @JsonProperty("statusColor")
     private String statusColor;
-
-
 }

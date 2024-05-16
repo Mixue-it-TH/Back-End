@@ -1,6 +1,7 @@
 package com.example.kanbanbackend.Service;
 
 import com.example.kanbanbackend.DTO.StatusDTO;
+import com.example.kanbanbackend.DTO.StatusEditDTO;
 import com.example.kanbanbackend.DTO.StatusSelectedDTO;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
@@ -9,6 +10,7 @@ import com.example.kanbanbackend.Exception.ItemNotFoundDelUpdate;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Repository.StatusRepository;
 import com.example.kanbanbackend.Repository.TaskRepository;
+import com.example.kanbanbackend.Utils.Permission;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,9 @@ public class StatusService {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private Permission permission;
+
     public List<StatusDTO> getAllStatus(){
         List<Status> status = repository.findAll();
         return  listMapper.mapList(status,StatusDTO.class);
@@ -53,6 +58,7 @@ public class StatusService {
         return mapper.map(status,StatusSelectedDTO.class);
     }
     public StatusDTO createStatus(StatusDTO newStatusDTO){
+
         Status status = mapper.map(newStatusDTO,Status.class);
         if(status.getStatusColor() == null || status.getStatusColor().isBlank()){
             status.setStatusColor("#6b7280");
@@ -67,8 +73,12 @@ public class StatusService {
         repository.saveAndFlush(status);
         return mapper.map(status,StatusDTO.class);
     }
-    public StatusDTO updateStatus(Integer statusId, StatusDTO editedStatus ){
-        if(editedStatus.getId() == 1) throw new BadRequestException("No Status can't edit");
+    public StatusDTO updateStatus(Integer statusId, StatusEditDTO editedStatus ){
+        if(permission.canEditOrDelete(statusId)) {
+            System.out.println(editedStatus.getId());
+            throw new RuntimeException("You can't edit " + editedStatus.getStatusName());
+        }
+//        if(editedStatus.getId() == 1) throw new BadRequestException("No Status can't edit");
        Status oldStatus = repository.findById(statusId).orElseThrow(() -> new ItemNotFoundDelUpdate(" NOT FOUND "));
         oldStatus.setStatusName(editedStatus.getStatusName() != null ? editedStatus.getStatusName().trim() : oldStatus.getStatusName());
         oldStatus.setStatusDescription(editedStatus.getStatusDescription() == null ? null : editedStatus.getStatusDescription().trim());
@@ -78,7 +88,11 @@ public class StatusService {
     }
 
     public void deleteStatus(Integer delId){
-        if(delId == 1) throw new BadRequestException("No Status can't delete");
+        if(permission.canEditOrDelete(delId)) {
+            Status delDetail = repository.findById(delId).orElseThrow(() -> new ItemNotFoundException("NOT FOUND"));
+            throw new RuntimeException("You can't delete" + delDetail.getStatusName());
+        }
+//        if(delId == 1) throw new BadRequestException("No Status can't delete");
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         repository.delete(statusDel);
     }
