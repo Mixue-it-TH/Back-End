@@ -30,10 +30,7 @@ public class TaskController {
                                              @RequestParam(defaultValue = "ASC")String sortDirection){
         return ResponseEntity.ok(service.getAllTodo(filterStatuses,sortBy,sortDirection));
     }
-    @GetMapping("/islimit")
-    public ResponseEntity<Object> getTaskLimit(){
-        return ResponseEntity.ok(service.getLimitConfig());
-    }
+
 
 
     @GetMapping("/{id}")

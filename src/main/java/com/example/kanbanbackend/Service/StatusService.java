@@ -1,5 +1,9 @@
 package com.example.kanbanbackend.Service;
 
+import com.example.kanbanbackend.DTO.LimitFunc.LimitConfigDTO;
+import com.example.kanbanbackend.DTO.LimitFunc.LimitDetailsDTO;
+import com.example.kanbanbackend.DTO.LimitFunc.StatusMaximum;
+import com.example.kanbanbackend.DTO.LimitFunc.StatusTasksNumDTO;
 import com.example.kanbanbackend.DTO.StatusDTO;
 import com.example.kanbanbackend.DTO.StatusEditDTO;
 import com.example.kanbanbackend.DTO.StatusSelectedDTO;
@@ -20,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -124,6 +129,36 @@ public class StatusService {
             });
             repository.delete(statusDel);
         }
+    }
+
+    public LimitConfigDTO getLimitConfig() {
+        LimitConfigDTO limitConfigDTO = new LimitConfigDTO();
+        limitConfigDTO.setLimitMaximumTask(LimitConfig.isLimit);
+        limitConfigDTO.setNoOfTasks(LimitConfig.number);
+        return limitConfigDTO;
+    }
+
+    public LimitDetailsDTO yeahaha(StatusMaximum statusConfig) {
+        LimitConfig.isLimit = statusConfig.getlimitMaximumTask();
+        LimitConfig.number = statusConfig.getNumber();
+        List<Status> statusList = repository.findAll();
+        List<Integer> numOfTasks = new ArrayList<>();
+        LimitDetailsDTO statusTaskLimitDTO = new LimitDetailsDTO();
+        statusList.removeIf(status -> {
+            List<Task> tasks = taskRepository.findByTaskStatus(status);
+            if (tasks.size() > LimitConfig.number && permission.canEditOrDelete(status.getId())) {
+                numOfTasks.add(tasks.size());
+            }
+            return tasks.size() <= LimitConfig.number || !permission.canEditOrDelete(status.getId());
+        });
+        List<StatusTasksNumDTO> statusTasksNumDTO = listMapper.mapList(statusList, StatusTasksNumDTO.class);
+        for (int i = 0; i < statusTasksNumDTO.size(); i++) {
+            statusTasksNumDTO.get(i).setNumOfTasks(numOfTasks.get(i));
+        }
+        statusTaskLimitDTO.setStatusList(statusTasksNumDTO);
+        statusTaskLimitDTO.setNoOfTasks(LimitConfig.number);
+        statusTaskLimitDTO.setLimitMaximumTask(LimitConfig.isLimit);
+        return statusTaskLimitDTO;
     }
 
 }

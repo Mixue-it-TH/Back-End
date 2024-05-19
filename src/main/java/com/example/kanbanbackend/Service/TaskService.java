@@ -144,12 +144,7 @@ public class TaskService {
         Task task = repository.findById(id).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         return mapper.map(task, TaskDTO.class);
     }
-    public LimitConfigDTO getLimitConfig(){
-        LimitConfigDTO limitConfigDTO = new LimitConfigDTO() ;
-        limitConfigDTO.setLimit(LimitConfig.isLimit);
-        limitConfigDTO.setNumber(LimitConfig.number);
-        return limitConfigDTO;
-    }
+
 
 
 }

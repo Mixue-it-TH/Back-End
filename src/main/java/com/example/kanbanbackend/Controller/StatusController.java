@@ -1,5 +1,6 @@
 package com.example.kanbanbackend.Controller;
 
+import com.example.kanbanbackend.DTO.LimitFunc.LimitConfigDTO;
 import com.example.kanbanbackend.DTO.StatusDTO;
 import com.example.kanbanbackend.DTO.StatusEditDTO;
 import com.example.kanbanbackend.DTO.LimitFunc.StatusMaximum;
@@ -30,6 +31,11 @@ public class StatusController {
         return ResponseEntity.ok(service.getAllStatus());
     }
 
+    @GetMapping("/islimit")
+    public ResponseEntity<Object> getLimitConfig(){
+        return ResponseEntity.ok(service.getLimitConfig());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Object> getStatusById(@PathVariable Integer id){
         return ResponseEntity.ok(service.getStatusById(id));
@@ -58,10 +64,7 @@ public class StatusController {
     }
     @PatchMapping("/maximum-task")
     public ResponseEntity<Object> statusLimitConfig(@RequestBody StatusMaximum status){
-        LimitConfig.isLimit = status.getlimitMaximumTask();
-        LimitConfig.number = status.getNumber();
-
-        return ResponseEntity.ok(taskService.getLimitConfig());
+        return ResponseEntity.ok(service.yeahaha(status));
     }
 
 

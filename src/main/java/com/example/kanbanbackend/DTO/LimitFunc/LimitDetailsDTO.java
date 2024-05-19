@@ -1,15 +1,16 @@
 package com.example.kanbanbackend.DTO.LimitFunc;
 
-import com.example.kanbanbackend.Utils.LimitConfig;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class LimitConfigDTO {
+public class LimitDetailsDTO {
     private boolean limitMaximumTask;
 
     public boolean getlimitMaximumTask() {
         return limitMaximumTask;
     }
     private Integer noOfTasks;
+    private List<StatusTasksNumDTO> statusList;
 }
