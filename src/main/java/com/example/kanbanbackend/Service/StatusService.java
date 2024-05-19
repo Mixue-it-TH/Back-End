@@ -104,9 +104,16 @@ public class StatusService {
 
     public void deleteStatusAndTransfer(Integer delId, Integer tranferId) {
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
-        if (LimitConfig.isLimit && permission.canEditOrDelete(delId)) {
+        Status statusTranfer = repository.findById(tranferId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
+        System.out.println(LimitConfig.isLimit);
+        System.out.println(permission.canEditOrDelete(tranferId));
+        if (LimitConfig.isLimit && permission.canEditOrDelete(tranferId)) {
+            System.out.println("tererer");
+            System.out.println(LimitConfig.number);
             List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
-            if (listTasks.size() >= LimitConfig.number) {
+            List<Task> listTasksTransfer = taskRepository.findByTaskStatus(statusTranfer);
+
+            if ((listTasks.size() + listTasksTransfer.size()) > LimitConfig.number) {
                 throw new BadRequestException("You can't delete" + statusDel.getStatusName() + "have on the limit");
             }
         }

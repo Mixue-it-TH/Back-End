@@ -54,7 +54,7 @@ public class TaskService {
     public List<TaskDTO> getAllTodo(List<String> filterStatuses,String sortBy,String sortDirection){
         System.out.println(sortDirection);
         List<Task> taskList = new ArrayList<>();
-        Sort.Direction direction = sortDirection.equals("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
         System.out.println(direction);
         if ("statusName".equals(sortBy)) {
             sortBy = "taskStatus.statusName";
