@@ -14,7 +14,7 @@ public class StatusDTO {
 
     @JsonProperty("name")
     @Size(max = 50)
-    @NotBlank
+    @NotBlank(message = "must not be null")
     private String statusName;
 
     @JsonProperty("description")

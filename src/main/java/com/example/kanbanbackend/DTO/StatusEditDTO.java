@@ -1,10 +1,7 @@
 package com.example.kanbanbackend.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -13,11 +10,11 @@ public class StatusEditDTO {
 
     @JsonProperty("name")
     @Size(max = 50)
-    @NotBlank
+    @NotBlank(message = "must not be null")
     private String statusName;
 
     @JsonProperty("description")
-    @Size(max = 200)
+    @Size(min=1, max = 200)
     private String statusDescription;
 
     @JsonProperty("statusColor")

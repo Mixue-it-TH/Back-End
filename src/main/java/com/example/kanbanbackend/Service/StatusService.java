@@ -66,12 +66,15 @@ public class StatusService {
     }
 
     public StatusDTO createStatus(StatusDTO newStatusDTO) {
-
+        Status isDuplicate = repository.findStatusByStatusName(newStatusDTO.getStatusName());
+        if(isDuplicate != null){
+            throw new BadRequestException("must be unique");
+        }
         Status status = mapper.map(newStatusDTO, Status.class);
         if (status.getStatusColor() == null || status.getStatusColor().isBlank()) {
             status.setStatusColor("#6b7280");
         }
-        System.out.println(status);
+
         Optional.ofNullable(status.getStatusName())
                 .map(String::trim)
                 .ifPresent(status::setStatusName);
@@ -84,7 +87,11 @@ public class StatusService {
 
     public StatusDTO updateStatus(Integer statusId, StatusEditDTO editedStatus) {
         if (!permission.canEditOrDelete(statusId)) {
-            throw new BadRequestException("You can't edit No Status or Done");
+            throw new BadRequestException("No Status cannot be modified. and Done cannot be modified. respectively.");
+        }
+        Status isDuplicate = repository.findStatusByStatusName(editedStatus.getStatusName());
+        if(isDuplicate != null){
+            throw new BadRequestException("must be unique");
         }
         Status oldStatus = repository.findById(statusId).orElseThrow(() -> new ItemNotFoundDelUpdate(" NOT FOUND "));
         oldStatus.setStatusName(editedStatus.getStatusName() != null ? editedStatus.getStatusName().trim() : oldStatus.getStatusName());
@@ -96,8 +103,12 @@ public class StatusService {
 
     public void deleteStatus(Integer delId) {
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND "));
+        List<Task> taskStillUse = taskRepository.findByTaskStatus(statusDel);
+        if(!taskStillUse.isEmpty()){
+            throw new BadRequestException("destination status for task transfer not specified.");
+        }
         if (!permission.canEditOrDelete(delId)) {
-            throw new BadRequestException("You can't delete" + statusDel.getStatusName());
+            throw new BadRequestException("No Status cannot be deleted. and Done cannot be deleted. respectively");
         } else if (LimitConfig.isLimit && permission.canEditOrDelete(delId)) {
             List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
             if (listTasks.size() >= LimitConfig.number) {
@@ -108,10 +119,13 @@ public class StatusService {
     }
 
     public void deleteStatusAndTransfer(Integer delId, Integer tranferId) {
+        if(delId.equals(tranferId) ){
+            throw new BadRequestException("destination status for task transfer must be different from current status");
+        }
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
-        Status statusTranfer = repository.findById(tranferId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
+        Status statusTranfer = repository.findById(tranferId).orElseThrow(() -> new BadRequestException("the specified status for task transfer does not exist."));
         if (LimitConfig.isLimit) {
-            System.out.println(LimitConfig.number);
+
             List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
             List<Task> listTasksTransfer = taskRepository.findByTaskStatus(statusTranfer);
 
@@ -122,7 +136,6 @@ public class StatusService {
         Status statusTransfer = repository.findById(tranferId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
         if (statusDel != null && statusTransfer != null) {
             List<Task> taskList = taskRepository.findByTaskStatus(statusDel);
-            System.out.println(taskList);
             taskList.forEach((task) -> {
                 task.setTaskStatus(statusTransfer);
                 taskRepository.save(task);
@@ -138,7 +151,7 @@ public class StatusService {
         return limitConfigDTO;
     }
 
-    public LimitDetailsDTO yeahaha(StatusMaximum statusConfig) {
+    public LimitDetailsDTO checkExceedLimit(StatusMaximum statusConfig) {
         LimitConfig.isLimit = statusConfig.getlimitMaximumTask();
         LimitConfig.number = statusConfig.getNumber();
         List<Status> statusList = repository.findAll();
@@ -146,10 +159,10 @@ public class StatusService {
         LimitDetailsDTO statusTaskLimitDTO = new LimitDetailsDTO();
         statusList.removeIf(status -> {
             List<Task> tasks = taskRepository.findByTaskStatus(status);
-            if (tasks.size() > LimitConfig.number && permission.canEditOrDelete(status.getId())) {
+            if (tasks.size() >= LimitConfig.number && permission.canEditOrDelete(status.getId())) {
                 numOfTasks.add(tasks.size());
             }
-            return tasks.size() <= LimitConfig.number || !permission.canEditOrDelete(status.getId());
+            return tasks.size() < LimitConfig.number || !permission.canEditOrDelete(status.getId());
         });
         List<StatusTasksNumDTO> statusTasksNumDTO = listMapper.mapList(statusList, StatusTasksNumDTO.class);
         for (int i = 0; i < statusTasksNumDTO.size(); i++) {
