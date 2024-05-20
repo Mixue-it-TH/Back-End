@@ -63,7 +63,7 @@ public class StatusController {
     }
     @PatchMapping("/maximum-task")
     public ResponseEntity<Object> statusLimitConfig(@RequestBody StatusMaximum status){
-        return ResponseEntity.ok(service.yeahaha(status));
+        return ResponseEntity.ok(service.checkExceedLimit(status));
     }
 
 

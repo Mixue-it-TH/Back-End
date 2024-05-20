@@ -16,7 +16,7 @@ public class TaskDTO {
     @JsonProperty("title")
     private String taskTitle;
 
-    @Size(max = 100)
+    @Size(max = 500)
     @JsonProperty("description")
     private String taskDescription;
 

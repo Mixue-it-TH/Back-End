@@ -52,10 +52,10 @@ public class TaskService {
 //    }
 
     public List<TaskDTO> getAllTodo(List<String> filterStatuses,String sortBy,String sortDirection){
-        System.out.println(sortDirection);
+
         List<Task> taskList = new ArrayList<>();
         Sort.Direction direction = sortDirection.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        System.out.println(direction);
+
         if ("statusName".equals(sortBy)) {
             sortBy = "taskStatus.statusName";
         }
@@ -70,7 +70,7 @@ public class TaskService {
 
     public TaskSelectedDTO getTaskById(int id) throws ItemNotFoundException {
         Task task =  repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Task "+ id +" does not exist !!!" ));
-        System.out.println(task);
+
         LocalDateTime createdDateTime = LocalDateTime.parse(task.getCreatedOn(), DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT));
         LocalDateTime updatedDateTime = LocalDateTime.parse(task.getUpdatedOn(), DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT));
 
@@ -107,12 +107,13 @@ public class TaskService {
 
     public TaskDTO updateTask(Integer taskId, TaskEditDTO editedTask ){
         if(LimitConfig.isLimit && permission.canEditOrDelete(editedTask.getTaskStatusId().getId())){
+
             List<Task> listTasks = repository.findByTaskStatus(editedTask.getTaskStatusId());
             if(listTasks.size() >= LimitConfig.number) {
-                throw new BadRequestException("The Status has on the limit ("+ LimitConfig.number +")s You can't edit !!!");
+                throw new BadRequestException("The Status has on the limit (" + LimitConfig.number + ")s You can't edit !!!");
             }
         }
-
+        Status isExited = statusRepository.findById(editedTask.getTaskStatusId().getId()).orElseThrow(() -> new BadRequestException("does not exist"));
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         Optional.ofNullable(editedTask.getTaskTitle())
                 .map(String::trim)

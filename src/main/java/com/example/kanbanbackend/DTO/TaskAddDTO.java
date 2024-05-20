@@ -18,7 +18,7 @@ public class TaskAddDTO {
     private String taskTitle;
 
     @JsonProperty("description")
-    @Size(max = 100)
+    @Size(max = 500)
     private String taskDescription;
 
     @JsonProperty("assignees")
