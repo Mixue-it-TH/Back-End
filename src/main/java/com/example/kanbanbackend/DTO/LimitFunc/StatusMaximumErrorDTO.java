@@ -1,28 +1,38 @@
-package com.example.kanbanbackend.DTO;
+package com.example.kanbanbackend.DTO.LimitFunc;
 
+import com.example.kanbanbackend.DTO.LimitFunc.TaskMaximumDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.hibernate.validator.constraints.UniqueElements;
+
+import java.util.List;
 
 @Data
-public class StatusDTO {
+public class StatusMaximumErrorDTO {
+    @NotNull
     private Integer id;
 
     @JsonProperty("name")
     @Size(max = 50)
-    @NotBlank(message = "must not be null")
+    @NotBlank
     private String statusName;
 
+    @JsonIgnore
     @JsonProperty("description")
     @Size(max = 200)
+    @NotEmpty
     private String statusDescription;
 
-    @JsonProperty("statusColor")
-    private String statusColor;
+    private boolean limitMaximumTask;
 
+    public boolean getlimitMaximumTask() {
+        return limitMaximumTask;
+    }
+    private Integer noOfTasks;
 
+    private List<TaskMaximumDTO> tasks;
 }

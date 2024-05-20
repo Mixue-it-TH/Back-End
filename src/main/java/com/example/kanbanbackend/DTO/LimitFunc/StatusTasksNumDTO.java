@@ -1,20 +1,17 @@
-package com.example.kanbanbackend.DTO;
+package com.example.kanbanbackend.DTO.LimitFunc;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Data
-public class StatusDTO {
+public class StatusTasksNumDTO {
     private Integer id;
 
     @JsonProperty("name")
     @Size(max = 50)
-    @NotBlank(message = "must not be null")
+    @NotBlank
     private String statusName;
 
     @JsonProperty("description")
@@ -24,5 +21,5 @@ public class StatusDTO {
     @JsonProperty("statusColor")
     private String statusColor;
 
-
+    private Integer numOfTasks;
 }
