@@ -43,7 +43,6 @@ public class StatusController {
 
     @PostMapping("")
     public ResponseEntity<Object> addStatus(@Valid @RequestBody StatusDTO newStatusDTO){
-        System.out.println(newStatusDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createStatus(newStatusDTO));
     }
 

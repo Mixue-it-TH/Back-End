@@ -10,6 +10,7 @@ import com.example.kanbanbackend.DTO.StatusSelectedDTO;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Exception.BadRequestException;
+import com.example.kanbanbackend.Exception.BadRequestWithFieldException;
 import com.example.kanbanbackend.Exception.ItemNotFoundDelUpdate;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Repository.StatusRepository;
@@ -67,11 +68,13 @@ public class StatusService {
 
     public StatusDTO createStatus(StatusDTO newStatusDTO) {
 
+        Status duplicate = repository.findStatusByStatusName(newStatusDTO.getStatusName());
+        if(duplicate != null) throw new BadRequestWithFieldException("name","must be unique");
         Status status = mapper.map(newStatusDTO, Status.class);
+        System.out.println("status:" + status);
         if (status.getStatusColor() == null || status.getStatusColor().isBlank()) {
             status.setStatusColor("#6b7280");
         }
-        System.out.println(status);
         Optional.ofNullable(status.getStatusName())
                 .map(String::trim)
                 .ifPresent(status::setStatusName);
@@ -146,11 +149,12 @@ public class StatusService {
         LimitDetailsDTO statusTaskLimitDTO = new LimitDetailsDTO();
         statusList.removeIf(status -> {
             List<Task> tasks = taskRepository.findByTaskStatus(status);
-            if (tasks.size() > LimitConfig.number && permission.canEditOrDelete(status.getId())) {
+            if (tasks.size() >= LimitConfig.number && permission.canEditOrDelete(status.getId())) {
                 numOfTasks.add(tasks.size());
             }
-            return tasks.size() <= LimitConfig.number || !permission.canEditOrDelete(status.getId());
+            return tasks.size() < LimitConfig.number || !permission.canEditOrDelete(status.getId());
         });
+        System.out.println(statusList);
         List<StatusTasksNumDTO> statusTasksNumDTO = listMapper.mapList(statusList, StatusTasksNumDTO.class);
         for (int i = 0; i < statusTasksNumDTO.size(); i++) {
             statusTasksNumDTO.get(i).setNumOfTasks(numOfTasks.get(i));

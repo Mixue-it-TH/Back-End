@@ -94,7 +94,6 @@ public class TaskService {
             if(listTasks.size() >= LimitConfig.number) {
                 throw new BadRequestException("The Status has on the limit ("+ LimitConfig.number +")s");
             }
-
         }
         Task newTask = mapper.map(newTaskDTO,Task.class);
         newTask.setTaskTitle(newTaskDTO.getTaskTitle() == null ? null : newTaskDTO.getTaskTitle().trim());
@@ -113,6 +112,7 @@ public class TaskService {
                 throw new BadRequestException("The Status has on the limit ("+ LimitConfig.number +")s You can't edit !!!");
             }
         }
+
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         Optional.ofNullable(editedTask.getTaskTitle())
                 .map(String::trim)
