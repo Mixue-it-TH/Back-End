@@ -14,7 +14,7 @@ public class StatusEditDTO {
     private String statusName;
 
     @JsonProperty("description")
-    @Size(min=1, max = 200)
+    @Size( max = 200)
     private String statusDescription;
 
     @JsonProperty("statusColor")

@@ -13,7 +13,7 @@ public class TaskAddDTO {
     private Integer id;
 
     @JsonProperty("title")
-    @NotBlank(message = "Your title can't not be null")
+    @NotBlank(message = "title must not be null")
     @Size(max = 100)
     private String taskTitle;
 

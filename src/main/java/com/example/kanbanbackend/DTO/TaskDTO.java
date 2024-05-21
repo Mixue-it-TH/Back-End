@@ -25,7 +25,6 @@ public class TaskDTO {
     private String taskAssignees;
 
     @JsonProperty("status")
-
     private StatusListAllTaskDTO taskStatus;
 
 

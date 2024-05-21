@@ -16,11 +16,7 @@ public class ErrorResponse {
     private String message;
     private String path;
 
-    private Map<String, Object> additionalFields = new HashMap<>();
 
-    public void addField(String key, Object value) {
-        this.additionalFields.put(key, value);
-    }
 
     public ErrorResponse(String timestamp, int status, String error, String message, String path) {
         this.timestamp = timestamp;

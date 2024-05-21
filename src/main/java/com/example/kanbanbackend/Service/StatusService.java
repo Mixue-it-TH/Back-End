@@ -91,7 +91,7 @@ public class StatusService {
         }
         Status isDuplicate = repository.findStatusByStatusName(editedStatus.getStatusName());
         if(isDuplicate != null){
-            throw new BadRequestException("must be unique");
+            throw new BadRequestWithFieldException("name","must be unique");
         }
         Status oldStatus = repository.findById(statusId).orElseThrow(() -> new ItemNotFoundDelUpdate(" NOT FOUND "));
         oldStatus.setStatusName(editedStatus.getStatusName() != null ? editedStatus.getStatusName().trim() : oldStatus.getStatusName());
@@ -105,7 +105,7 @@ public class StatusService {
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND "));
         List<Task> taskStillUse = taskRepository.findByTaskStatus(statusDel);
         if(!taskStillUse.isEmpty()){
-            throw new BadRequestException("destination status for task transfer not specified.");
+            throw new BadRequestException("destination cannot be " + statusDel.getStatusName() +  "for task transfer not specified.");
         }
         if (!permission.canEditOrDelete(delId)) {
             throw new BadRequestException("No Status cannot be deleted. and Done cannot be deleted. respectively");
@@ -120,7 +120,7 @@ public class StatusService {
 
     public void deleteStatusAndTransfer(Integer delId, Integer tranferId) {
         if(delId.equals(tranferId) ){
-            throw new BadRequestException("destination status for task transfer must be different from current status");
+            throw new BadRequestException("destination cannot be status for task transfer must be different from current status");
         }
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
         Status statusTranfer = repository.findById(tranferId).orElseThrow(() -> new BadRequestException("the specified status for task transfer does not exist."));

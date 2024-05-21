@@ -3,6 +3,7 @@ package com.example.kanbanbackend.DTO;
 import com.example.kanbanbackend.Entitites.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -12,7 +13,7 @@ public class TaskEditDTO {
     private Integer id;
 
     @JsonProperty("title")
-    @NotBlank
+    @NotEmpty(message = "must not be null")
     @Size(max = 100)
     private String taskTitle;
 
@@ -24,7 +25,9 @@ public class TaskEditDTO {
     @Size(max = 30)
     private String taskAssignees;
 
-    @JsonProperty("status")
-    private Status taskStatusId;
+//    @JsonProperty("status")
+//    private Status taskStatusId;
+@JsonProperty("status")
+private Integer taskStatusId;
 
 }
