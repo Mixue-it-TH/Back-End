@@ -6,6 +6,7 @@ import com.example.kanbanbackend.DTO.LimitFunc.LimitConfigDTO;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Exception.BadRequestException;
+import com.example.kanbanbackend.Exception.BadRequestWithFieldException;
 import com.example.kanbanbackend.Exception.ItemNotFoundDelUpdate;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Repository.StatusRepository;
@@ -88,7 +89,7 @@ public class TaskService {
     }
 
     public TaskDTO createTask(TaskAddDTO newTaskDTO) {
-        Status statusfind = statusRepository.findById(newTaskDTO.getTaskStatusId()).orElseThrow(() -> new ItemNotFoundException("Status "+ newTaskDTO.getTaskStatusId() +" does not exist !!!" ));
+        Status statusfind = statusRepository.findById(newTaskDTO.getTaskStatusId()).orElseThrow(() -> new BadRequestException("Status "+ newTaskDTO.getTaskStatusId() +" does not exist !!!" ));
         if(LimitConfig.isLimit && permission.canEditOrDelete(newTaskDTO.getTaskStatusId())){
             List<Task> listTasks = repository.findByTaskStatus(statusfind);
             if(listTasks.size() >= LimitConfig.number) {
@@ -106,14 +107,16 @@ public class TaskService {
     }
 
     public TaskDTO updateTask(Integer taskId, TaskEditDTO editedTask ){
-        if(LimitConfig.isLimit && permission.canEditOrDelete(editedTask.getTaskStatusId().getId())){
+        if(editedTask.getTaskTitle() == null) throw new BadRequestWithFieldException("titie","must not be null");
+        if(LimitConfig.isLimit && permission.canEditOrDelete(editedTask.getTaskStatusId())){
 
-            List<Task> listTasks = repository.findByTaskStatus(editedTask.getTaskStatusId());
+            List<Task> listTasks = repository.findByTaskStatusId(editedTask.getTaskStatusId());
             if(listTasks.size() >= LimitConfig.number) {
                 throw new BadRequestException("The Status has on the limit (" + LimitConfig.number + ")s You can't edit !!!");
             }
         }
-        Status isExited = statusRepository.findById(editedTask.getTaskStatusId().getId()).orElseThrow(() -> new BadRequestException("does not exist"));
+        System.out.println(editedTask.getTaskStatusId());
+       Status isExited = statusRepository.findById(editedTask.getTaskStatusId()).orElseThrow(() -> new BadRequestWithFieldException("status","does not exist"));
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         Optional.ofNullable(editedTask.getTaskTitle())
                 .map(String::trim)
@@ -127,7 +130,7 @@ public class TaskService {
         oldTask.setId(editedTask.getId() != null ? editedTask.getId() : oldTask.getId());
         oldTask.setTaskTitle(editedTask.getTaskTitle() != null ? editedTask.getTaskTitle() : oldTask.getTaskTitle());
         oldTask.setTaskAssignees(editedTask.getTaskAssignees() != null ? editedTask.getTaskAssignees() : oldTask.getTaskAssignees());
-        oldTask.setTaskStatus(editedTask.getTaskStatusId() != null ? editedTask.getTaskStatusId() : oldTask.getTaskStatus());
+        oldTask.setTaskStatus(editedTask.getTaskStatusId() != null ? isExited: oldTask.getTaskStatus());
         oldTask.setTaskDescription(editedTask.getTaskDescription() != null ? editedTask.getTaskDescription() : oldTask.getTaskDescription());
         repository.save(oldTask);
         StatusSelectedDTO newStatus = statusService.getStatusById(oldTask.getTaskStatus().getId());
