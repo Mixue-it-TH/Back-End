@@ -120,7 +120,7 @@ public class StatusService {
 
     public void deleteStatusAndTransfer(Integer delId, Integer tranferId) {
         if(delId.equals(tranferId) ){
-            throw new BadRequestException("destination cannot be status for task transfer must be different from current status");
+            throw new BadRequestException("destination status for task transfer must be different from current status");
         }
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
         Status statusTranfer = repository.findById(tranferId).orElseThrow(() -> new BadRequestException("the specified status for task transfer does not exist."));
