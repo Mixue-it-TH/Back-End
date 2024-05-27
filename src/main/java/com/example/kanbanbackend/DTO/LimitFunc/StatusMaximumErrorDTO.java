@@ -1,6 +1,6 @@
 package com.example.kanbanbackend.DTO.LimitFunc;
 
-import com.example.kanbanbackend.DTO.LimitFunc.TaskMaximumDTO;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

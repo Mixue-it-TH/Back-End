@@ -1,10 +1,7 @@
-package com.example.kanbanbackend.DTO;
+package com.example.kanbanbackend.DTO.TaskDTO;
 
-import com.example.kanbanbackend.Entitites.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -25,9 +22,7 @@ public class TaskEditDTO {
     @Size(max = 30)
     private String taskAssignees;
 
-//    @JsonProperty("status")
-//    private Status taskStatusId;
-@JsonProperty("status")
-private Integer taskStatusId;
+    @JsonProperty("status")
+    private Integer taskStatusId;
 
 }

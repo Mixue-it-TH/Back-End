@@ -1,8 +1,11 @@
 package com.example.kanbanbackend.Service;
 
 
-import com.example.kanbanbackend.DTO.*;
-import com.example.kanbanbackend.DTO.LimitFunc.LimitConfigDTO;
+import com.example.kanbanbackend.DTO.StatusDTO.StatusSelectedDTO;
+import com.example.kanbanbackend.DTO.TaskDTO.TaskAddDTO;
+import com.example.kanbanbackend.DTO.TaskDTO.TaskDTO;
+import com.example.kanbanbackend.DTO.TaskDTO.TaskEditDTO;
+import com.example.kanbanbackend.DTO.TaskDTO.TaskSelectedDTO;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Exception.BadRequestException;
@@ -14,7 +17,6 @@ import com.example.kanbanbackend.Repository.TaskRepository;
 import com.example.kanbanbackend.Utils.LimitConfig;
 import com.example.kanbanbackend.Utils.Permission;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.internal.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
@@ -47,12 +48,8 @@ public class TaskService {
     @Autowired
     private Permission permission;
 
-//    public List<TaskDTO> getAllTodo(){
-//        List<Task> tasks = repository.findAll();
-//        return  listMapper.mapList(tasks,TaskDTO.class);
-//    }
 
-    public List<TaskDTO> getAllTodo(List<String> filterStatuses,String sortBy,String sortDirection){
+    public List<TaskDTO> getAllTodo(List<String> filterStatuses, String sortBy, String sortDirection){
 
         List<Task> taskList = new ArrayList<>();
         Sort.Direction direction = sortDirection.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
@@ -115,7 +112,6 @@ public class TaskService {
                 throw new BadRequestException("The Status has on the limit (" + LimitConfig.number + ")s You can't edit !!!");
             }
         }
-        System.out.println(editedTask.getTaskStatusId());
        Status isExited = statusRepository.findById(editedTask.getTaskStatusId()).orElseThrow(() -> new BadRequestWithFieldException("status","does not exist"));
         Task oldTask = repository.findById(taskId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
         Optional.ofNullable(editedTask.getTaskTitle())
@@ -130,7 +126,7 @@ public class TaskService {
         oldTask.setId(editedTask.getId() != null ? editedTask.getId() : oldTask.getId());
         oldTask.setTaskTitle(editedTask.getTaskTitle() != null ? editedTask.getTaskTitle() : oldTask.getTaskTitle());
         oldTask.setTaskAssignees(editedTask.getTaskAssignees() != null ? editedTask.getTaskAssignees() : oldTask.getTaskAssignees());
-        oldTask.setTaskStatus(editedTask.getTaskStatusId() != null ? isExited: oldTask.getTaskStatus());
+        oldTask.setTaskStatus(editedTask.getTaskStatusId() != null ? isExited : oldTask.getTaskStatus());
         oldTask.setTaskDescription(editedTask.getTaskDescription() != null ? editedTask.getTaskDescription() : oldTask.getTaskDescription());
         repository.save(oldTask);
         StatusSelectedDTO newStatus = statusService.getStatusById(oldTask.getTaskStatus().getId());
@@ -139,15 +135,14 @@ public class TaskService {
         return mapper.map(oldTask, TaskDTO.class);
     }
 
-    public void deleteTask(Integer delId){
-        Task delTask = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate( "He's already gone " + delId));
+
+    public TaskDTO deleteTask(Integer delId){
+        Task delTask = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND"));
         repository.delete(delTask);
+        return mapper.map(delTask, TaskDTO.class);
     }
 
-    public TaskDTO getTaskByIdForDel(Integer id){
-        Task task = repository.findById(id).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND "));
-        return mapper.map(task, TaskDTO.class);
-    }
+
 
 
 

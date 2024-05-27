@@ -1,4 +1,4 @@
-package com.example.kanbanbackend.DTO;
+package com.example.kanbanbackend.DTO.TaskDTO;
 
 import com.example.kanbanbackend.Entitites.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;

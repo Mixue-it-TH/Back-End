@@ -4,9 +4,9 @@ import com.example.kanbanbackend.DTO.LimitFunc.LimitConfigDTO;
 import com.example.kanbanbackend.DTO.LimitFunc.LimitDetailsDTO;
 import com.example.kanbanbackend.DTO.LimitFunc.StatusMaximum;
 import com.example.kanbanbackend.DTO.LimitFunc.StatusTasksNumDTO;
-import com.example.kanbanbackend.DTO.StatusDTO;
-import com.example.kanbanbackend.DTO.StatusEditDTO;
-import com.example.kanbanbackend.DTO.StatusSelectedDTO;
+import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
+import com.example.kanbanbackend.DTO.StatusDTO.StatusEditDTO;
+import com.example.kanbanbackend.DTO.StatusDTO.StatusSelectedDTO;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Exception.BadRequestException;
@@ -66,12 +66,13 @@ public class StatusService {
         return mapper.map(status, StatusSelectedDTO.class);
     }
 
+
     public StatusDTO createStatus(StatusDTO newStatusDTO) {
         Status duplicate = repository.findStatusByStatusName(newStatusDTO.getStatusName());
         if(duplicate != null) throw new BadRequestWithFieldException("name","must be unique");
 
         Status status = mapper.map(newStatusDTO, Status.class);
-        System.out.println("status:" + status);
+
         if (status.getStatusColor() == null || status.getStatusColor().isBlank()) {
             status.setStatusColor("#6b7280");
         }
@@ -84,6 +85,7 @@ public class StatusService {
         repository.saveAndFlush(status);
         return mapper.map(status, StatusDTO.class);
     }
+
 
     public StatusDTO updateStatus(Integer statusId, StatusEditDTO editedStatus) {
         if (!permission.canEditOrDelete(statusId)) {
@@ -101,6 +103,7 @@ public class StatusService {
         return mapper.map(oldStatus, StatusDTO.class);
     }
 
+
     public void deleteStatus(Integer delId) {
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND "));
         List<Task> taskStillUse = taskRepository.findByTaskStatus(statusDel);
@@ -117,6 +120,7 @@ public class StatusService {
         }
         repository.delete(statusDel);
     }
+
 
     public void deleteStatusAndTransfer(Integer delId, Integer tranferId) {
         if(delId.equals(tranferId) ){
@@ -164,7 +168,6 @@ public class StatusService {
             }
             return tasks.size() < LimitConfig.number || !permission.canEditOrDelete(status.getId());
         });
-        System.out.println(statusList);
         List<StatusTasksNumDTO> statusTasksNumDTO = listMapper.mapList(statusList, StatusTasksNumDTO.class);
         for (int i = 0; i < statusTasksNumDTO.size(); i++) {
             statusTasksNumDTO.get(i).setNumOfTasks(numOfTasks.get(i));

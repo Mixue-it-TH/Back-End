@@ -17,18 +17,6 @@ import java.time.format.DateTimeFormatter;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ResponseEntity<ErrorValidationResponse> handleHandlerMethodValidationException(HandlerMethodValidationException exception, WebRequest request) {
-//        ErrorValidationResponse errorResponse = new ErrorValidationResponse(HttpStatus.UNPROCESSABLE_ENTITY.value(), "Validation error. Check 'errors' field for details.", request.getDescription(false));
-//        List<ParameterValidationResult> paramNames = exception.getAllValidationResults();
-//        for (ParameterValidationResult param : paramNames) {
-//            errorResponse.addValidationError(param.getMethodParameter().getParameterName(), param.getResolvableErrors().get(0).getDefaultMessage() + " (" + param.getArgument().toString() + ")" );
-//        }
-//        return ResponseEntity.unprocessableEntity().body(errorResponse);
-////        return buildErrorResponse(null, exception, exception.getMethod().getName(), HttpStatus.valueOf(exception.getStatusCode().value()), request);
-//    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorValidationResponse> handleHandlerMethodValidationException(MethodArgumentNotValidException exception, WebRequest request) {
@@ -38,7 +26,6 @@ public class GlobalExceptionHandler {
             errorResponse.addValidationError(fieldError.getField(),fieldError.getDefaultMessage());
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-//        return buildErrorResponse(null, exception, exception.getMethod().getName(), HttpStatus.valueOf(exception.getStatusCode().value()), request);
     }
 
     @ExceptionHandler(ItemNotFoundException.class)
