@@ -17,6 +17,7 @@ import com.example.kanbanbackend.Repository.StatusRepository;
 import com.example.kanbanbackend.Repository.TaskRepository;
 import com.example.kanbanbackend.Utils.LimitConfig;
 import com.example.kanbanbackend.Utils.Permission;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,7 @@ public class StatusService {
         return mapper.map(status, StatusSelectedDTO.class);
     }
 
-
+    @Transactional
     public StatusDTO createStatus(StatusDTO newStatusDTO) {
         Status duplicate = repository.findStatusByStatusName(newStatusDTO.getStatusName());
         if(duplicate != null) throw new BadRequestWithFieldException("name","must be unique");
@@ -86,7 +87,7 @@ public class StatusService {
         return mapper.map(status, StatusDTO.class);
     }
 
-
+    @Transactional
     public StatusDTO updateStatus(Integer statusId, StatusEditDTO editedStatus) {
         if (!permission.canEditOrDelete(statusId)) {
             throw new BadRequestException("No Status cannot be modified. and Done cannot be modified. respectively.");
@@ -103,7 +104,7 @@ public class StatusService {
         return mapper.map(oldStatus, StatusDTO.class);
     }
 
-
+    @Transactional
     public void deleteStatus(Integer delId) {
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND "));
         List<Task> taskStillUse = taskRepository.findByTaskStatus(statusDel);
@@ -121,7 +122,7 @@ public class StatusService {
         repository.delete(statusDel);
     }
 
-
+    @Transactional
     public void deleteStatusAndTransfer(Integer delId, Integer tranferId) {
         if(delId.equals(tranferId) ){
             throw new BadRequestException("destination status for task transfer must be different from current status");

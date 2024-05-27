@@ -16,6 +16,7 @@ import com.example.kanbanbackend.Repository.StatusRepository;
 import com.example.kanbanbackend.Repository.TaskRepository;
 import com.example.kanbanbackend.Utils.LimitConfig;
 import com.example.kanbanbackend.Utils.Permission;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -85,6 +86,7 @@ public class TaskService {
 
     }
 
+    @Transactional
     public TaskDTO createTask(TaskAddDTO newTaskDTO) {
         Status statusfind = statusRepository.findById(newTaskDTO.getTaskStatusId()).orElseThrow(() -> new BadRequestException("Status "+ newTaskDTO.getTaskStatusId() +" does not exist !!!" ));
         if(LimitConfig.isLimit && permission.canEditOrDelete(newTaskDTO.getTaskStatusId())){
@@ -102,7 +104,7 @@ public class TaskService {
         newTask.setTaskStatus(status);
         return mapper.map(newTask, TaskDTO.class);
     }
-
+    @Transactional
     public TaskDTO updateTask(Integer taskId, TaskEditDTO editedTask ){
         if(editedTask.getTaskTitle() == null) throw new BadRequestWithFieldException("titie","must not be null");
         if(LimitConfig.isLimit && permission.canEditOrDelete(editedTask.getTaskStatusId())){
@@ -135,7 +137,7 @@ public class TaskService {
         return mapper.map(oldTask, TaskDTO.class);
     }
 
-
+    @Transactional
     public TaskDTO deleteTask(Integer delId){
         Task delTask = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate( "NOT FOUND"));
         repository.delete(delTask);
