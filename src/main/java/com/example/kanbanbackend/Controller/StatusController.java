@@ -1,20 +1,15 @@
 package com.example.kanbanbackend.Controller;
 
-import com.example.kanbanbackend.DTO.LimitFunc.LimitConfigDTO;
-import com.example.kanbanbackend.DTO.StatusDTO;
-import com.example.kanbanbackend.DTO.StatusEditDTO;
+import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
+import com.example.kanbanbackend.DTO.StatusDTO.StatusEditDTO;
 import com.example.kanbanbackend.DTO.LimitFunc.StatusMaximum;
-import com.example.kanbanbackend.Entitites.Task;
 import com.example.kanbanbackend.Service.StatusService;
 import com.example.kanbanbackend.Service.TaskService;
-import com.example.kanbanbackend.Utils.LimitConfig;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173","http://ip23sy2.sit.kmutt.ac.th","https://intproj23.sit.kmutt.ac.th"})
@@ -52,14 +47,16 @@ public class StatusController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteStatus(@PathVariable Integer id){
+    public ResponseEntity<Object> deleteStatus(@PathVariable Integer id){
+
         service.deleteStatus(id);
+        return ResponseEntity.ok().body("{}");
     }
 
     @DeleteMapping("/{id}/{newId}")
     public ResponseEntity<Object> deleteStatusAndTransferToStatus(@PathVariable Integer id,@PathVariable Integer newId){
         service.deleteStatusAndTransfer(id,newId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("{}");
     }
     @PatchMapping("/maximum-task")
     public ResponseEntity<Object> statusLimitConfig(@RequestBody StatusMaximum status){

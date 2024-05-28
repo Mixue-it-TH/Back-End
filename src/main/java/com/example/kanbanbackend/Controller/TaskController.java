@@ -1,19 +1,15 @@
 package com.example.kanbanbackend.Controller;
 
-import com.example.kanbanbackend.DTO.TaskAddDTO;
-import com.example.kanbanbackend.DTO.TaskEditDTO;
-import com.example.kanbanbackend.DTO.TaskDTO;
+import com.example.kanbanbackend.DTO.TaskDTO.TaskAddDTO;
+import com.example.kanbanbackend.DTO.TaskDTO.TaskEditDTO;
 import com.example.kanbanbackend.Service.TaskService;
-import com.example.kanbanbackend.Utils.LimitConfig;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -45,16 +41,12 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateTask(@Valid @PathVariable Integer id, @Valid @RequestBody TaskEditDTO editedTask){
-        System.out.println(id);
-        System.out.println(editedTask);
         return ResponseEntity.ok(service.updateTask(id, editedTask));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteTask(@PathVariable Integer id){
-        TaskDTO taskDetail = service.getTaskByIdForDel(id);
-        service.deleteTask(id);
-        return ResponseEntity.ok(taskDetail);
+        return ResponseEntity.ok(service.deleteTask(id));
     }
 
 }

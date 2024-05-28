@@ -9,7 +9,7 @@ import java.util.List;
 
 @Component
 public class Permission {
-    private static List<Integer> exceptStatus = new ArrayList<>(Arrays.asList(1,6));
+    private static List<Integer> exceptStatus = new ArrayList<>(Arrays.asList(1,7));
 
     public boolean canEditOrDelete(Integer id){
         return !exceptStatus.contains(id);
