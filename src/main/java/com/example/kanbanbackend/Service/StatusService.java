@@ -94,7 +94,7 @@ public class StatusService {
         }
         Status isDuplicate = repository.findStatusByStatusName(editedStatus.getStatusName());
         Status oldStatus = repository.findById(statusId).orElseThrow(() -> new ItemNotFoundException("NOT FONUD"));
-        if(isDuplicate != null ){
+        if(isDuplicate != null && (!oldStatus.getStatusName().equalsIgnoreCase(editedStatus.getStatusName()))){
            throw new BadRequestWithFieldException("name","must be unique");
         }
         oldStatus.setStatusName(editedStatus.getStatusName() != null ? editedStatus.getStatusName().trim() : oldStatus.getStatusName());
