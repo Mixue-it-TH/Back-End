@@ -130,10 +130,8 @@ public class StatusService {
         Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
         Status statusTranfer = repository.findById(tranferId).orElseThrow(() -> new BadRequestException("the specified status for task transfer does not exist."));
         if (LimitConfig.isLimit) {
-
             List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
             List<Task> listTasksTransfer = taskRepository.findByTaskStatus(statusTranfer);
-
             if ((listTasks.size() + listTasksTransfer.size()) > LimitConfig.number) {
                 throw new BadRequestException("You can't delete" + statusDel.getStatusName() + "have on the limit");
             }
