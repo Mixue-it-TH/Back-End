@@ -93,10 +93,10 @@ public class StatusService {
             throw new BadRequestException("No Status cannot be modified. and Done cannot be modified. respectively.");
         }
         Status isDuplicate = repository.findStatusByStatusName(editedStatus.getStatusName());
-        if(isDuplicate != null){
-            throw new BadRequestWithFieldException("name","must be unique");
+        Status oldStatus = repository.findById(statusId).orElseThrow(() -> new ItemNotFoundException("NOT FONUD"));
+        if(isDuplicate != null && (!oldStatus.getStatusName().equalsIgnoreCase(editedStatus.getStatusName()))){
+           throw new BadRequestWithFieldException("name","must be unique");
         }
-        Status oldStatus = repository.findById(statusId).orElseThrow(() -> new ItemNotFoundDelUpdate(" NOT FOUND "));
         oldStatus.setStatusName(editedStatus.getStatusName() != null ? editedStatus.getStatusName().trim() : oldStatus.getStatusName());
         oldStatus.setStatusDescription(editedStatus.getStatusDescription() == null ? null : editedStatus.getStatusDescription().trim());
         oldStatus.setStatusColor(editedStatus.getStatusColor() != null ? editedStatus.getStatusColor() : oldStatus.getStatusColor());

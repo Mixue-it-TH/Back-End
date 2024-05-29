@@ -1,16 +1,16 @@
 package com.example.kanbanbackend.DTO.TaskDTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class TaskEditDTO {
+public class TaskAddEditDTO {
     private Integer id;
 
     @JsonProperty("title")
-    @NotEmpty(message = "must not be null")
+    @NotBlank(message = "title must not be null")
     @Size(max = 100)
     private String taskTitle;
 
@@ -24,5 +24,4 @@ public class TaskEditDTO {
 
     @JsonProperty("status")
     private Integer taskStatusId;
-
 }
