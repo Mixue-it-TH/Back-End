@@ -43,6 +43,7 @@ public class StatusController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateStatus(@Valid @PathVariable Integer id,@Valid @RequestBody StatusEditDTO editedStatus){
+        System.out.println(editedStatus);
         return ResponseEntity.ok(service.updateStatus(id, editedStatus));
     }
 
