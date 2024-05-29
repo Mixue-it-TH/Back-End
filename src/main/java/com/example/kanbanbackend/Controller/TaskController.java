@@ -1,7 +1,6 @@
 package com.example.kanbanbackend.Controller;
 
 import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
-import com.example.kanbanbackend.DTO.TaskDTO.TaskEditDTO;
 import com.example.kanbanbackend.Service.TaskService;
 import jakarta.validation.Valid;
 

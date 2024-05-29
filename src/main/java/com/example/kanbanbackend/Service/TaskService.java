@@ -4,7 +4,6 @@ package com.example.kanbanbackend.Service;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusSelectedDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskDTO;
-import com.example.kanbanbackend.DTO.TaskDTO.TaskEditDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskSelectedDTO;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
