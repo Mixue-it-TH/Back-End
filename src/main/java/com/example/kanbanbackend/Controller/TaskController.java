@@ -1,7 +1,6 @@
 package com.example.kanbanbackend.Controller;
 
-import com.example.kanbanbackend.DTO.TaskDTO.TaskAddDTO;
-import com.example.kanbanbackend.DTO.TaskDTO.TaskEditDTO;
+import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
 import com.example.kanbanbackend.Service.TaskService;
 import jakarta.validation.Valid;
 
@@ -35,12 +34,12 @@ public class TaskController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> addTask(@Valid @RequestBody TaskAddDTO newTaskDTO){
+    public ResponseEntity<Object> addTask(@Valid @RequestBody TaskAddEditDTO newTaskDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createTask(newTaskDTO)   );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateTask(@Valid @PathVariable Integer id, @Valid @RequestBody TaskEditDTO editedTask){
+    public ResponseEntity<Object> updateTask(@Valid @PathVariable Integer id, @Valid @RequestBody TaskAddEditDTO editedTask){
         return ResponseEntity.ok(service.updateTask(id, editedTask));
     }
 
