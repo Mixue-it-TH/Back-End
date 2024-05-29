@@ -2,7 +2,7 @@ package com.example.kanbanbackend.Service;
 
 
 import com.example.kanbanbackend.DTO.StatusDTO.StatusSelectedDTO;
-import com.example.kanbanbackend.DTO.TaskDTO.TaskAddDTO;
+import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskEditDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskSelectedDTO;
@@ -87,7 +87,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskDTO createTask(TaskAddDTO newTaskDTO) {
+    public TaskDTO createTask(TaskAddEditDTO newTaskDTO) {
         Status statusfind = statusRepository.findById(newTaskDTO.getTaskStatusId()).orElseThrow(() -> new BadRequestException("Status "+ newTaskDTO.getTaskStatusId() +" does not exist !!!" ));
         if(LimitConfig.isLimit && permission.canEditOrDelete(newTaskDTO.getTaskStatusId())){
             List<Task> listTasks = repository.findByTaskStatus(statusfind);
@@ -105,7 +105,7 @@ public class TaskService {
         return mapper.map(newTask, TaskDTO.class);
     }
     @Transactional
-    public TaskDTO updateTask(Integer taskId, TaskEditDTO editedTask ){
+    public TaskDTO updateTask(Integer taskId, TaskAddEditDTO editedTask ){
         if(editedTask.getTaskTitle() == null) throw new BadRequestWithFieldException("titie","must not be null");
         if(LimitConfig.isLimit && permission.canEditOrDelete(editedTask.getTaskStatusId())){
 
