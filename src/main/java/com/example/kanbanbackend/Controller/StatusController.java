@@ -1,10 +1,8 @@
 package com.example.kanbanbackend.Controller;
 
+import com.example.kanbanbackend.DTO.LimitFunc.LimitConfigDTO;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
-import com.example.kanbanbackend.DTO.StatusDTO.StatusEditDTO;
-import com.example.kanbanbackend.DTO.LimitFunc.StatusMaximum;
 import com.example.kanbanbackend.Service.StatusService;
-import com.example.kanbanbackend.Service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,14 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173","http://ip23sy2.sit.kmutt.ac.th","http://intproj23.sit.kmutt.ac.th"})
+@CrossOrigin(origins = {"http://ip23sy2.sit.kmutt.ac.th","http://intproj23.sit.kmutt.ac.th"})
 @RequestMapping("/v2/statuses")
 public class StatusController {
     @Autowired
     private StatusService service;
-
-    @Autowired
-    private TaskService taskService;
 
     @GetMapping("")
     public ResponseEntity<Object> getAllStatus(){
@@ -42,7 +37,7 @@ public class StatusController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateStatus(@Valid @PathVariable Integer id,@Valid @RequestBody StatusEditDTO editedStatus){
+    public ResponseEntity<Object> updateStatus(@Valid @PathVariable Integer id,@Valid @RequestBody StatusDTO editedStatus){
         return ResponseEntity.ok(service.updateStatus(id, editedStatus));
     }
 
@@ -59,7 +54,7 @@ public class StatusController {
         return ResponseEntity.ok().body("{}");
     }
     @PatchMapping("/maximum-task")
-    public ResponseEntity<Object> statusLimitConfig(@RequestBody StatusMaximum status){
+    public ResponseEntity<Object> statusLimitConfig(@RequestBody LimitConfigDTO status){
         return ResponseEntity.ok(service.checkExceedLimit(status));
     }
 

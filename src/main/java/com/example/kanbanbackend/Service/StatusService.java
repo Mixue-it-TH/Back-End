@@ -2,10 +2,8 @@ package com.example.kanbanbackend.Service;
 
 import com.example.kanbanbackend.DTO.LimitFunc.LimitConfigDTO;
 import com.example.kanbanbackend.DTO.LimitFunc.LimitDetailsDTO;
-import com.example.kanbanbackend.DTO.LimitFunc.StatusMaximum;
 import com.example.kanbanbackend.DTO.LimitFunc.StatusTasksNumDTO;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
-import com.example.kanbanbackend.DTO.StatusDTO.StatusEditDTO;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusSelectedDTO;
 import com.example.kanbanbackend.Entitites.Status;
 import com.example.kanbanbackend.Entitites.Task;
@@ -88,7 +86,7 @@ public class StatusService {
     }
 
     @Transactional
-    public StatusDTO updateStatus(Integer statusId, StatusEditDTO editedStatus) {
+    public StatusDTO updateStatus(Integer statusId, StatusDTO editedStatus) {
         if (!permission.canEditOrDelete(statusId)) {
             throw new BadRequestException("No Status cannot be modified. and Done cannot be modified. respectively.");
         }
@@ -154,9 +152,9 @@ public class StatusService {
         return limitConfigDTO;
     }
 
-    public LimitDetailsDTO checkExceedLimit(StatusMaximum statusConfig) {
+    public LimitDetailsDTO checkExceedLimit(LimitConfigDTO statusConfig) {
         LimitConfig.isLimit = statusConfig.getlimitMaximumTask();
-        LimitConfig.number = statusConfig.getNumber();
+        LimitConfig.number = statusConfig.getNoOfTasks();
         List<Status> statusList = repository.findAll();
         List<Integer> numOfTasks = new ArrayList<>();
         LimitDetailsDTO statusTaskLimitDTO = new LimitDetailsDTO();
