@@ -1,6 +1,5 @@
-package com.example.kanbanbackend.Utils;
+package com.example.kanbanbackend.Config;
 
-import org.hibernate.mapping.Array;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

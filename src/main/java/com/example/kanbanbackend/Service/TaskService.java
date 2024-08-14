@@ -5,16 +5,16 @@ import com.example.kanbanbackend.DTO.StatusDTO.StatusSelectedDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskSelectedDTO;
-import com.example.kanbanbackend.Entitites.Status;
-import com.example.kanbanbackend.Entitites.Task;
+import com.example.kanbanbackend.Entitites.Primary.Status;
+import com.example.kanbanbackend.Entitites.Primary.Task;
 import com.example.kanbanbackend.Exception.BadRequestException;
 import com.example.kanbanbackend.Exception.BadRequestWithFieldException;
 import com.example.kanbanbackend.Exception.ItemNotFoundDelUpdate;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
-import com.example.kanbanbackend.Repository.StatusRepository;
-import com.example.kanbanbackend.Repository.TaskRepository;
-import com.example.kanbanbackend.Utils.LimitConfig;
-import com.example.kanbanbackend.Utils.Permission;
+import com.example.kanbanbackend.Repository.Primary.StatusRepository;
+import com.example.kanbanbackend.Repository.Primary.TaskRepository;
+import com.example.kanbanbackend.Config.LimitConfig;
+import com.example.kanbanbackend.Config.Permission;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +107,6 @@ public class TaskService {
     public TaskDTO updateTask(Integer taskId, TaskAddEditDTO editedTask ){
         if(editedTask.getTaskTitle() == null) throw new BadRequestWithFieldException("titie","must not be null");
         if(LimitConfig.isLimit && permission.canEditOrDelete(editedTask.getTaskStatusId())){
-
             List<Task> listTasks = repository.findByTaskStatusId(editedTask.getTaskStatusId());
             if(listTasks.size() >= LimitConfig.number) {
                 throw new BadRequestException("The Status has on the limit (" + LimitConfig.number + ")s You can't edit !!!");
