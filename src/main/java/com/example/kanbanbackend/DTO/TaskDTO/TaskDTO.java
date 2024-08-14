@@ -26,6 +26,4 @@ public class TaskDTO {
     @JsonProperty("status")
     private StatusListAllTaskDTO taskStatus;
 
-
-
 }
