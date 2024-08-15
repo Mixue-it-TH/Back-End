@@ -29,7 +29,6 @@ import java.util.HashMap;
         }
 )
 public class ShareDbConfig {
-    @Primary
     @Bean(name = "shareDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.share")
     public DataSource dataSource() {
@@ -38,7 +37,6 @@ public class ShareDbConfig {
 
 
 
-    @Primary
     @Bean(name = "shareEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder, @Qualifier("shareDataSource") DataSource dataSource) {
 
@@ -49,7 +47,6 @@ public class ShareDbConfig {
                 .properties(properties).packages("com.example.kanbanbackend.Entitites.Share").persistenceUnit("share").build();
     }
 
-    @Primary
     @Bean(name = "shareTransactionManager")
     public PlatformTransactionManager transactionManager(@Qualifier("shareEntityManagerFactory") EntityManagerFactory shareEntityManagerFactory) {
         return new JpaTransactionManager(shareEntityManagerFactory);

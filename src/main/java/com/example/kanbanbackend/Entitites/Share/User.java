@@ -1,24 +1,37 @@
 package com.example.kanbanbackend.Entitites.Share;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    @Column(name = "oid", nullable = false)
+    @Size(max = 36)
+    private String oid;
 
+    @NotNull
+    @Size(max = 100, message = "")
+    private String name;
 
-    @Column(length = 50,nullable = false)
+    @NotNull
+    @Size(max = 50, message = "")
     private String username;
 
-    @Size(max = 14,message = "TOO LONG KUB")
-    @Column(length = 14,nullable = false)
+    @NotNull
+    @Size(max = 50,message = "")
+    private String email;
+
+    @NotNull
+    @Size(max = 100,message = "")
     private String password;
+
+    @NotNull
+    private String role;
 }
+
