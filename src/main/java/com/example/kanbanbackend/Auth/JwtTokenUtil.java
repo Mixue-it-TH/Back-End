@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,8 @@ public class JwtTokenUtil implements Serializable {
 
     @Value("${jwt.max-token-interval-hour}")
     private long JWT_TOKEN_VALIDITY;
+
+    SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
 
     public String getUsernameFromToken(String token) {
@@ -53,14 +56,15 @@ public class JwtTokenUtil implements Serializable {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
-    public String generateToken(User user) {
+    public String generateToken(UserDetails user) {
         Map<String, Object> claims = new HashMap<>();
         System.out.println(user);
         claims.put("iss", "https://intproj23.sit.kmutt.ac.th/sy2/");
-        claims.put("name",user.getName());
-        claims.put("oid",user.getOid());
-        claims.put("email",user.getEmail());
-        claims.put("role",user.getRole());
+        claims.put("name",user.getUsername());
+//        claims.put("name",user.getName());
+//        claims.put("oid",user.getOid());
+//        claims.put("email",user.getEmail());
+//        claims.put("role",user.getRole());
         return doGenerateToken(claims, user.getUsername());
     }
 
@@ -72,15 +76,13 @@ public class JwtTokenUtil implements Serializable {
                 .setSubject(subject) // Set the subject (username)
                 .setIssuedAt(new Date()) // Set issued date
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY)) // Set expiration date
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY) // Sign the token with the secret key
+                .signWith(signatureAlgorithm, SECRET_KEY) // Sign the token with the secret key
                 .compact();
     }
 
-    public Boolean isTokenValid(String token, String username) {
-        final String tokenUsername = getUsernameFromToken(token);
-        return (
-                tokenUsername.equals(username)
-                        && !isTokenExpired(token));
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = getUsernameFromToken(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
 }
