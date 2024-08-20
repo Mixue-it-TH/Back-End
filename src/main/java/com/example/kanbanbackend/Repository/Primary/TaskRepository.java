@@ -1,8 +1,8 @@
-package com.example.kanbanbackend.Repository;
+package com.example.kanbanbackend.Repository.Primary;
 
 
-import com.example.kanbanbackend.Entitites.Status;
-import com.example.kanbanbackend.Entitites.Task;
+import com.example.kanbanbackend.Entitites.Primary.Status;
+import com.example.kanbanbackend.Entitites.Primary.Task;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

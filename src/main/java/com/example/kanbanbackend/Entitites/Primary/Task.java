@@ -1,4 +1,4 @@
-package com.example.kanbanbackend.Entitites;
+package com.example.kanbanbackend.Entitites.Primary;
 
 import jakarta.persistence.*;
 import lombok.Data;
