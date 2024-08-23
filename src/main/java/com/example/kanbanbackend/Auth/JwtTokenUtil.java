@@ -24,7 +24,7 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    @Value("${jwt.max-token-interval-hour}")
+    @Value("#{${jwt.max-token-interval-minutes}*60*1000}")
     private long JWT_TOKEN_VALIDITY;
 
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -74,12 +74,13 @@ public class JwtTokenUtil implements Serializable {
 
     // Generate JWT token with claims(any config) and subject(username)
     private String doGenerateToken(Map<String, Object> claims, String subject) {
+        long expirationTime = (long) Math.floor(System.currentTimeMillis() + JWT_TOKEN_VALIDITY);
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT") // Add header
                 .setClaims(claims) // Set claims
                 .setSubject(subject) // Set the subject (username)
                 .setIssuedAt(new Date()) // Set issued date
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY)) // Set expiration date
+                .setExpiration(new Date(expirationTime)) // Set expiration date
                 .signWith(signatureAlgorithm, SECRET_KEY) // Sign the token with the secret key
                 .compact();
     }
