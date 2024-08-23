@@ -50,15 +50,19 @@ public class UserService {
     }
 
     public Token login(JwtRequestUser userData) {
+        // check is user is exist on the DB
+        User user = repository.findUsersByUsername(userData.getUserName());
+        if(user == null) throw new UnauthorizedException("Username or Password is incorrect");
+
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userData.getUsername(), userData.getPassword());
+                new UsernamePasswordAuthenticationToken(userData.getUserName(), userData.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
             if (!authentication.isAuthenticated()) {
                 throw new UsernameNotFoundException("Invalid user or password");
             }
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String tokenGenarate = jwtTokenUtil.generateToken(userDetails);
+        String tokenGenarate = jwtTokenUtil.generateToken(user);
         Token token = new Token();
         token.setAccess_token(tokenGenarate);
         return  token;

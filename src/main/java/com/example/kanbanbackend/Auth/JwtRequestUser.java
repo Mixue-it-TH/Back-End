@@ -8,9 +8,9 @@ import lombok.Data;
 public class JwtRequestUser {
 
     @Size(max = 50,message = "Username or Password is invalid")
-    @NotEmpty(message = "Please enter your username")
-    private String username;
+    @NotEmpty(message = "username can not be empty")
+    private String userName;
     @Size(max = 14,message = "Username or Password is invalid")
-    @NotEmpty(message = "Please enter you password")
+    @NotEmpty(message = "password can not be empy")
     private String password;
 }

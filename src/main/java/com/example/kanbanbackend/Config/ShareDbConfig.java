@@ -36,7 +36,6 @@ public class ShareDbConfig {
     }
 
 
-
     @Bean(name = "shareEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder, @Qualifier("shareDataSource") DataSource dataSource) {
 

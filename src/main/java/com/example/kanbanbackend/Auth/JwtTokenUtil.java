@@ -1,9 +1,11 @@
 package com.example.kanbanbackend.Auth;
 
 import com.example.kanbanbackend.Entitites.Share.User;
+import com.example.kanbanbackend.Repository.Share.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -26,6 +28,9 @@ public class JwtTokenUtil implements Serializable {
     private long JWT_TOKEN_VALIDITY;
 
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+
+    @Autowired
+    UserRepository userRepository;
 
 
     public String getUsernameFromToken(String token) {
@@ -56,15 +61,13 @@ public class JwtTokenUtil implements Serializable {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
-    public String generateToken(UserDetails user) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        System.out.println(user);
         claims.put("iss", "https://intproj23.sit.kmutt.ac.th/sy2/");
-        claims.put("name",user.getUsername());
-//        claims.put("name",user.getName());
-//        claims.put("oid",user.getOid());
-//        claims.put("email",user.getEmail());
-//        claims.put("role",user.getRole());
+        claims.put("name",user.getName());
+        claims.put("oid",user.getOid());
+        claims.put("email",user.getEmail());
+        claims.put("role",user.getRole());
         return doGenerateToken(claims, user.getUsername());
     }
 
@@ -72,6 +75,7 @@ public class JwtTokenUtil implements Serializable {
     // Generate JWT token with claims(any config) and subject(username)
     private String doGenerateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT") // Add header
                 .setClaims(claims) // Set claims
                 .setSubject(subject) // Set the subject (username)
                 .setIssuedAt(new Date()) // Set issued date
