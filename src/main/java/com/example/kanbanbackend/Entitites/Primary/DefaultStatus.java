@@ -6,11 +6,12 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "customstatus")
-public class Status {
+@Table(name = "status")
+public class DefaultStatus {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "statusId", nullable = false)
+    @Column(name = "id", nullable = false)
     private Integer id;
 
     @NotBlank
@@ -23,14 +24,10 @@ public class Status {
     @Column(name = "statusColor")
     private String statusColor;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "boardId")
-    private Board boardId;
 
     @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
     private String createdOn;
 
     @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
     private String updatedOn;
-
 }

@@ -22,7 +22,7 @@ public class Task {
     private String taskAssignees;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "taskStatus")
+    @JoinColumn(name = "statusId")
     private Status taskStatus;
 
 
