@@ -11,8 +11,8 @@ import java.io.Serializable;
 public class BoardUserKey implements Serializable {
 
     @Column(name = "userId")
-    Integer userId;
+    private String userId;
 
     @Column(name = "boardId")
-    Integer boardId;
+    private Integer boardId;
 }

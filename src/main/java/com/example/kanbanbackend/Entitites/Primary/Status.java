@@ -27,10 +27,10 @@ public class Status {
     @JoinColumn(name = "boardId")
     private Board boardId;
 
-    @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
+    @Column(name = "createdOn", nullable = false, insertable = true, updatable = false)
     private String createdOn;
 
-    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
+    @Column(name = "updatedOn", nullable = false, insertable = true, updatable = true)
     private String updatedOn;
 
 }

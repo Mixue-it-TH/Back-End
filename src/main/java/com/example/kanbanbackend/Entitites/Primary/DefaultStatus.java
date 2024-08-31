@@ -8,7 +8,6 @@ import lombok.Data;
 @Entity
 @Table(name = "status")
 public class DefaultStatus {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -18,16 +17,15 @@ public class DefaultStatus {
     @Column(name = "statusName", nullable = false,unique = true)
     private String statusName;
 
-    @Column(name = "statusDescription")
-    private String statusDescription;
-
     @Column(name = "statusColor")
     private String statusColor;
 
-
-    @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
+    @Column(name = "createdOn", nullable = false, insertable = true, updatable = false)
     private String createdOn;
 
-    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
+    @Column(name = "updatedOn", nullable = false, insertable = true, updatable = true)
     private String updatedOn;
+    @Column(name = "statusDescription")
+    private String statusDescription;
+
 }

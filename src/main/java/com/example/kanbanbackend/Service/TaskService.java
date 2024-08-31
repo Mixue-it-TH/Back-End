@@ -5,6 +5,7 @@ import com.example.kanbanbackend.DTO.StatusDTO.StatusSelectedDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskSelectedDTO;
+import com.example.kanbanbackend.DTO.TaskDTO.TaskV3.TaskBoardDTO;
 import com.example.kanbanbackend.Entitites.Primary.Status;
 import com.example.kanbanbackend.Entitites.Primary.Task;
 import com.example.kanbanbackend.Exception.BadRequestException;
@@ -142,8 +143,14 @@ public class TaskService {
         return mapper.map(delTask, TaskDTO.class);
     }
 
+    // Version 3
 
-
-
+    public List<TaskBoardDTO> getTaskofBoard(Integer boardId){
+            List<Task> taskBoard = repository.findTaskByBoard_Id(boardId);
+            if(taskBoard.isEmpty()){
+                throw new BadRequestException("This board has no task !!");
+            }
+            return listMapper.mapList(taskBoard,TaskBoardDTO.class );
+    }
 
 }

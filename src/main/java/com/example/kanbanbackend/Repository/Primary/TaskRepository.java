@@ -14,7 +14,7 @@ public interface TaskRepository extends JpaRepository<Task,Integer> {
 
     List<Task> findByTaskStatus(Status taskStatus);
     List<Task> findByTaskStatusId(Integer id);
-
+    List<Task> findTaskByBoard_Id(Integer id);
 
 
     @Query("SELECT t FROM Task t JOIN t.taskStatus s WHERE s.statusName IN :statusNames")

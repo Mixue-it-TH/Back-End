@@ -22,7 +22,7 @@ public class BoardUser implements Serializable {
     @ManyToOne
     @MapsId("boardId")
     @JoinColumn(name = "boardId")
-    private  Board board;
+    private Board board;
 
     private String role;
 
