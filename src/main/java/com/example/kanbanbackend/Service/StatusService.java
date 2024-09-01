@@ -1,32 +1,36 @@
 package com.example.kanbanbackend.Service;
 
+import com.example.kanbanbackend.Config.LimitConfig;
+import com.example.kanbanbackend.Config.Permission;
 import com.example.kanbanbackend.DTO.LimitFunc.LimitConfigDTO;
 import com.example.kanbanbackend.DTO.LimitFunc.LimitDetailsDTO;
 import com.example.kanbanbackend.DTO.LimitFunc.StatusTasksNumDTO;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusSelectedDTO;
+import com.example.kanbanbackend.Entitites.Primary.Board;
+import com.example.kanbanbackend.Entitites.Primary.Config;
 import com.example.kanbanbackend.Entitites.Primary.Status;
 import com.example.kanbanbackend.Entitites.Primary.Task;
 import com.example.kanbanbackend.Exception.BadRequestException;
 import com.example.kanbanbackend.Exception.BadRequestWithFieldException;
 import com.example.kanbanbackend.Exception.ItemNotFoundDelUpdate;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
+import com.example.kanbanbackend.Repository.Primary.BoardRepository;
+import com.example.kanbanbackend.Repository.Primary.ConfigRepository;
 import com.example.kanbanbackend.Repository.Primary.StatusRepository;
 import com.example.kanbanbackend.Repository.Primary.TaskRepository;
-import com.example.kanbanbackend.Config.LimitConfig;
-import com.example.kanbanbackend.Config.Permission;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -42,33 +46,58 @@ public class StatusService {
     private TaskRepository taskRepository;
 
     @Autowired
+    private BoardRepository boardRepository;
+
+    @Autowired
+    private ConfigRepository configRepository;
+
+    @Autowired
     private Permission permission;
 
-    public List<StatusDTO> getAllStatus() {
-        List<Status> status = repository.findAll();
+    public List<StatusDTO> getAllStatusByBoardId(String boardId) {
+        List<Status> status = repository.findStatusByBoard_Id(boardId);
         return listMapper.mapList(status, StatusDTO.class);
     }
 
-    public StatusSelectedDTO getStatusById(int id) {
-        Status status = repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Status " + id + " does not exist !!!"));
+    public StatusSelectedDTO getStatusByIdAndBoardId(String boardId, int id) {
 
-        LocalDateTime createdDateTime = LocalDateTime.parse(status.getCreatedOn(), DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT));
-        LocalDateTime updatedDateTime = LocalDateTime.parse(status.getUpdatedOn(), DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT));
 
+        Status status = repository.findStatusByBoard_IdAndId(boardId, id);
+        if (status == null)
+            throw new ItemNotFoundException("Status id " + id + " or Board id" + boardId + " does not exist");
+
+        // Assuming `getCreatedOn` and `getUpdatedOn` return `Timestamp`
+        Timestamp createdOnTimestamp = status.getCreatedOn();
+        Timestamp updatedOnTimestamp = status.getUpdatedOn();
+
+        // Convert Timestamp to LocalDateTime
+        LocalDateTime createdDateTime = createdOnTimestamp.toLocalDateTime();
+        LocalDateTime updatedDateTime = updatedOnTimestamp.toLocalDateTime();
+
+        // Convert LocalDateTime to ZonedDateTime in UTC
         ZonedDateTime createdUTC = createdDateTime.atZone(ZoneOffset.UTC);
         ZonedDateTime updatedUTC = updatedDateTime.atZone(ZoneOffset.UTC);
 
+        // Convert ZonedDateTime to ISO 8601 format string
+        String createdOnISO = createdUTC.format(DateTimeFormatter.ISO_INSTANT);
+        String updatedOnISO = updatedUTC.format(DateTimeFormatter.ISO_INSTANT);
 
-        status.setCreatedOn(DateTimeFormatter.ISO_INSTANT.format(createdUTC));
-        status.setUpdatedOn(DateTimeFormatter.ISO_INSTANT.format(updatedUTC));
 
-        return mapper.map(status, StatusSelectedDTO.class);
+        StatusSelectedDTO dto = mapper.map(status, StatusSelectedDTO.class);
+
+        dto.setCreatedOn(createdOnISO);
+        dto.setUpdatedOn(updatedOnISO);
+
+        return dto;
     }
 
     @Transactional
-    public StatusDTO createStatus(StatusDTO newStatusDTO) {
-        Status duplicate = repository.findStatusByStatusName(newStatusDTO.getStatusName());
-        if(duplicate != null) throw new BadRequestWithFieldException("name","must be unique");
+    public StatusDTO createStatus(String boardId, StatusDTO newStatusDTO) {
+        Status duplicate = repository.findStatusByStatusNameAndBoard_Id(newStatusDTO.getStatusName(), boardId);
+        if (duplicate != null) throw new BadRequestWithFieldException("name", "must be unique");
+
+        Board board = boardRepository.findBoardById(boardId);
+        if (board == null) throw new ItemNotFoundException("Board id " + boardId + "doesn't exist!!");
 
         Status status = mapper.map(newStatusDTO, Status.class);
 
@@ -81,19 +110,24 @@ public class StatusService {
         Optional.ofNullable(status.getStatusDescription())
                 .map(String::trim)
                 .ifPresent(status::setStatusDescription);
+        status.setBoard(board);
         repository.saveAndFlush(status);
         return mapper.map(status, StatusDTO.class);
     }
 
     @Transactional
-    public StatusDTO updateStatus(Integer statusId, StatusDTO editedStatus) {
-        if (!permission.canEditOrDelete(statusId)) {
-            throw new BadRequestException("No Status cannot be modified. and Done cannot be modified. respectively.");
-        }
-        Status isDuplicate = repository.findStatusByStatusName(editedStatus.getStatusName());
-        Status oldStatus = repository.findById(statusId).orElseThrow(() -> new ItemNotFoundException("NOT FONUD"));
-        if(isDuplicate != null && (!oldStatus.getStatusName().equalsIgnoreCase(editedStatus.getStatusName()))){
-           throw new BadRequestWithFieldException("name","must be unique");
+    public StatusDTO updateStatus(String boardId, Integer statusId, StatusDTO editedStatus) {
+//        if (!permission.canEditOrDelete(statusId)) {
+//            throw new BadRequestException("No Status cannot be modified. and Done cannot be modified. respectively.");
+//        }
+        Status isDuplicate = repository.findStatusByStatusNameAndBoard_Id(boardId, editedStatus.getStatusName());
+
+        Status oldStatus = repository.findStatusByBoard_IdAndId(boardId, statusId);
+        if (oldStatus == null)
+            throw new ItemNotFoundException("Status id " + statusId + " or Board id" + boardId + " does not exist");
+
+        if (isDuplicate != null && (!oldStatus.getStatusName().equalsIgnoreCase(editedStatus.getStatusName()))) {
+            throw new BadRequestWithFieldException("name", "must be unique");
         }
         oldStatus.setStatusName(editedStatus.getStatusName() != null ? editedStatus.getStatusName().trim() : oldStatus.getStatusName());
         oldStatus.setStatusDescription(editedStatus.getStatusDescription() == null ? null : editedStatus.getStatusDescription().trim());
@@ -103,17 +137,22 @@ public class StatusService {
     }
 
     @Transactional
-    public void deleteStatus(Integer delId) {
-        Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND "));
+    public void deleteStatus(String boardId, Integer delId) {
+        Status statusDel = repository.findStatusByBoard_IdAndId(boardId,delId);
+        if(statusDel == null) throw new ItemNotFoundDelUpdate("NOT FOUND ");
+
         List<Task> taskStillUse = taskRepository.findByTaskStatus(statusDel);
-        if(!taskStillUse.isEmpty()){
-            throw new BadRequestException("destination cannot be " + statusDel.getStatusName() +  "for task transfer not specified.");
+        if (!taskStillUse.isEmpty()) {
+            throw new BadRequestException("destination cannot be " + statusDel.getStatusName() + " for task transfer not specified.");
         }
-        if (!permission.canEditOrDelete(delId)) {
-            throw new BadRequestException("No Status cannot be deleted. and Done cannot be deleted. respectively");
-        } else if (LimitConfig.isLimit && permission.canEditOrDelete(delId)) {
+
+        Config config = getLimitConfig(boardId);
+
+
+        if (config.getLimitmaximumTask() == 1) {
             List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
-            if (listTasks.size() >= LimitConfig.number) {
+            System.out.println(listTasks);
+            if (listTasks.size() >= config.getNoOfTasks()) {
                 throw new BadRequestException("You can't delete" + statusDel.getStatusName() + "have on the limit");
             }
         }
@@ -121,57 +160,67 @@ public class StatusService {
     }
 
     @Transactional
-    public void deleteStatusAndTransfer(Integer delId, Integer tranferId) {
-        if(delId.equals(tranferId) ){
+    public void deleteStatusAndTransfer(String boardId,Integer delId, Integer tranferId) {
+        if (delId.equals(tranferId)) {
             throw new BadRequestException("destination status for task transfer must be different from current status");
         }
-        Status statusDel = repository.findById(delId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
-        Status statusTranfer = repository.findById(tranferId).orElseThrow(() -> new BadRequestException("the specified status for task transfer does not exist."));
-        if (LimitConfig.isLimit) {
+        Status statusDel = repository.findStatusByBoard_IdAndId(boardId,delId);
+        if(statusDel == null) throw new ItemNotFoundDelUpdate("Board id or Status id was NOT FOUND ");
+
+        Status statusTranfer = repository.findStatusByBoard_IdAndId(boardId,tranferId);
+        if(statusTranfer == null) throw new ItemNotFoundDelUpdate("the specified status for task transfer does not exist. ");
+
+        Config config = getLimitConfig(boardId);
+        if(config.getLimitmaximumTask() == 1) {
             List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
             List<Task> listTasksTransfer = taskRepository.findByTaskStatus(statusTranfer);
-            if ((listTasks.size() + listTasksTransfer.size()) > LimitConfig.number) {
-                throw new BadRequestException("You can't delete" + statusDel.getStatusName() + "have on the limit");
+            if ((listTasks.size() + listTasksTransfer.size()) > config.getNoOfTasks()) {
+                throw new BadRequestException("You can't delete" + statusDel.getStatusName() + " xhave on the limit");
             }
         }
-        Status statusTransfer = repository.findById(tranferId).orElseThrow(() -> new ItemNotFoundDelUpdate("NOT FOUND"));
-        if (statusDel != null && statusTransfer != null) {
+        if (statusDel != null && statusTranfer != null) {
             List<Task> taskList = taskRepository.findByTaskStatus(statusDel);
             taskList.forEach((task) -> {
-                task.setTaskStatus(statusTransfer);
+                task.setTaskStatus(statusTranfer);
                 taskRepository.save(task);
             });
             repository.delete(statusDel);
         }
     }
 
-    public LimitConfigDTO getLimitConfig() {
-        LimitConfigDTO limitConfigDTO = new LimitConfigDTO();
-        limitConfigDTO.setLimitMaximumTask(LimitConfig.isLimit);
-        limitConfigDTO.setNoOfTasks(LimitConfig.number);
-        return limitConfigDTO;
+    public Config getLimitConfig(String boardId) {
+        Board board = boardRepository.findBoardById(boardId);
+        if(board == null) throw new ItemNotFoundException("Board id "+ boardId +" doesn't exist!");
+
+
+        return board.getConfigId();
     }
 
-    public LimitDetailsDTO checkExceedLimit(LimitConfigDTO statusConfig) {
-        LimitConfig.isLimit = statusConfig.getlimitMaximumTask();
-        LimitConfig.number = statusConfig.getNoOfTasks();
-        List<Status> statusList = repository.findAll();
+    public LimitDetailsDTO checkExceedLimit(String boardId,Config config) {
+        Config oldConfig = getLimitConfig(boardId);
+        oldConfig.setLimitmaximumTask(config.getLimitmaximumTask());
+        oldConfig.setNoOfTasks(config.getNoOfTasks());
+
+        configRepository.saveAndFlush(oldConfig);
+
+        List<Status> statusList = repository.findStatusByBoard_Id(boardId);
+
         List<Integer> numOfTasks = new ArrayList<>();
         LimitDetailsDTO statusTaskLimitDTO = new LimitDetailsDTO();
         statusList.removeIf(status -> {
             List<Task> tasks = taskRepository.findByTaskStatus(status);
-            if (tasks.size() >= LimitConfig.number && permission.canEditOrDelete(status.getId())) {
+            if (tasks.size() >= config.getNoOfTasks()) {
                 numOfTasks.add(tasks.size());
             }
-            return tasks.size() < LimitConfig.number || !permission.canEditOrDelete(status.getId());
+            return tasks.size() < config.getNoOfTasks() ;
         });
         List<StatusTasksNumDTO> statusTasksNumDTO = listMapper.mapList(statusList, StatusTasksNumDTO.class);
         for (int i = 0; i < statusTasksNumDTO.size(); i++) {
             statusTasksNumDTO.get(i).setNumOfTasks(numOfTasks.get(i));
         }
         statusTaskLimitDTO.setStatusList(statusTasksNumDTO);
-        statusTaskLimitDTO.setNoOfTasks(LimitConfig.number);
-        statusTaskLimitDTO.setLimitMaximumTask(LimitConfig.isLimit);
+        statusTaskLimitDTO.setNoOfTasks(config.getNoOfTasks());
+        statusTaskLimitDTO.setLimitMaximumTask(config.getLimitmaximumTask());
         return statusTaskLimitDTO;
     }
 

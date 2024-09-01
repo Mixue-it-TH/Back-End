@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 @Data
 @Entity
 @Table(name = "customstatus")
@@ -25,12 +29,27 @@ public class Status {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "boardId")
-    private Board boardId;
+    private Board board;
 
-    @Column(name = "createdOn", nullable = false, insertable = true, updatable = false)
-    private String createdOn;
 
-    @Column(name = "updatedOn", nullable = false, insertable = true, updatable = true)
-    private String updatedOn;
+    @Column(name = "createdOn")
+    private Timestamp createdOn;
+
+    @Column(name = "updatedOn")
+    private Timestamp updatedOn;
+
+    private static final ZoneId SYSTEM_ZONE = ZoneId.systemDefault();
+    @PrePersist
+    protected void onCreate() {
+        ZonedDateTime now = ZonedDateTime.now(SYSTEM_ZONE);
+        this.createdOn = Timestamp.from(now.toInstant());
+        this.updatedOn = this.createdOn;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        ZonedDateTime now = ZonedDateTime.now(SYSTEM_ZONE);
+        this.updatedOn = Timestamp.from(now.toInstant());
+    }
 
 }

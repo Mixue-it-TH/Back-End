@@ -49,9 +49,6 @@ public class TaskController {
 //    }
 
     // Version 3
-    @GetMapping("/{id}/tasks")
-    public ResponseEntity<Object> getBoardTask(@PathVariable Integer id){
-        return ResponseEntity.ok(service.getTaskofBoard(id));
-    }
+
 
 }

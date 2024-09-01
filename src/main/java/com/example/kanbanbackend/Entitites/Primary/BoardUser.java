@@ -26,4 +26,17 @@ public class BoardUser implements Serializable {
 
     private String role;
 
+    public BoardUser(User user, Board board, String role) {
+        this.user = user;
+        this.board = board;
+        this.role = role;
+
+        this.id = new BoardUserKey();
+        this.id.setUserId(user.getOid());
+        this.id.setBoardId(board.getId());
+    }
+
+    public BoardUser() {
+
+    }
 }

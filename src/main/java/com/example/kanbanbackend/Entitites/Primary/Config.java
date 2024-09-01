@@ -1,6 +1,7 @@
 package com.example.kanbanbackend.Entitites.Primary;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
@@ -8,12 +9,19 @@ import lombok.Data;
 @Table(name = "config")
 public class Config {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "settingId", nullable = false)
     private Integer id;
 
-    private String  limitmaximumTask;
 
-    private Integer isEnable;
+    private Integer  noOfTasks;
+
+    private Integer limitmaximumTask;
+
+    public Config() {
+        this.noOfTasks = 5;
+        this.limitmaximumTask = 0;
+    }
 }

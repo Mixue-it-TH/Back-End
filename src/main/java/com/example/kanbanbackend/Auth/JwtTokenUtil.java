@@ -47,7 +47,7 @@ public class JwtTokenUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) {
+    public Claims getAllClaimsFromToken(String token) {
 //        try {
             return Jwts.parser()
                     .setSigningKey(SECRET_KEY)

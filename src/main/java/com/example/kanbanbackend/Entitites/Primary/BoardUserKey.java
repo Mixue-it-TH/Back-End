@@ -14,5 +14,5 @@ public class BoardUserKey implements Serializable {
     private String userId;
 
     @Column(name = "boardId")
-    private Integer boardId;
+    private String boardId;
 }

@@ -18,6 +18,8 @@ public class User {
     @Size(max = 36)
     private String oid;
 
+
+
     @NotNull
     @Size(max = 100, message = "")
     private String userName;
@@ -25,4 +27,13 @@ public class User {
     @NotNull
     @Size(max = 50,message = "")
     private String email;
+
+    public User(String oid, String userName, String email) {
+        this.oid = oid;
+        this.userName = userName;
+        this.email = email;
+    }
+    public User() {
+
+    }
 }

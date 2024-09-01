@@ -6,9 +6,9 @@ import java.util.List;
 
 @Data
 public class LimitDetailsDTO {
-    private boolean limitMaximumTask;
+    private Integer limitMaximumTask;
 
-    public boolean getlimitMaximumTask() {
+    public Integer getlimitMaximumTask() {
         return limitMaximumTask;
     }
     private Integer noOfTasks;

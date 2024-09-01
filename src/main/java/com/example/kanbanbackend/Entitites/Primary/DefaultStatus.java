@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.sql.Timestamp;
+
 @Data
 @Entity
 @Table(name = "status")
@@ -20,11 +22,11 @@ public class DefaultStatus {
     @Column(name = "statusColor")
     private String statusColor;
 
-    @Column(name = "createdOn", nullable = false, insertable = true, updatable = false)
-    private String createdOn;
+    @Column(name = "createdOn", nullable = false, insertable = true, updatable = true)
+    private Timestamp createdOn;
 
     @Column(name = "updatedOn", nullable = false, insertable = true, updatable = true)
-    private String updatedOn;
+    private Timestamp updatedOn;
     @Column(name = "statusDescription")
     private String statusDescription;
 

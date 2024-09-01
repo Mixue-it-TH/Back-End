@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class BoardDTO {
     @JsonProperty("id")
-    private Integer boardId;
+    private String boardId;
     @JsonProperty("name")
     private String boardName;
     @JsonProperty("owner")
