@@ -70,6 +70,7 @@ public class BoardService {
             customStatus.setCreatedOn(Timestamp.valueOf(defaultStatus.getCreatedOn().toLocalDateTime()));
             customStatus.setUpdatedOn(Timestamp.valueOf(defaultStatus.getUpdatedOn().toLocalDateTime()));
             customStatus.setBoard(newBoard);// Associate CustomStatus with the new Board
+            System.out.println(customStatus);
             statusRepository.save(customStatus);
         }
         return mapper.map(boardUser, BoardDTO.class);

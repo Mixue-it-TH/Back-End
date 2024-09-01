@@ -149,7 +149,7 @@ public class StatusService {
         Config config = getLimitConfig(boardId);
 
 
-        if (config.getLimitmaximumTask() == 1) {
+        if (config.getLimitMaximumTask() == 1) {
             List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
             System.out.println(listTasks);
             if (listTasks.size() >= config.getNoOfTasks()) {
@@ -171,7 +171,7 @@ public class StatusService {
         if(statusTranfer == null) throw new ItemNotFoundDelUpdate("the specified status for task transfer does not exist. ");
 
         Config config = getLimitConfig(boardId);
-        if(config.getLimitmaximumTask() == 1) {
+        if(config.getLimitMaximumTask() == 1) {
             List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
             List<Task> listTasksTransfer = taskRepository.findByTaskStatus(statusTranfer);
             if ((listTasks.size() + listTasksTransfer.size()) > config.getNoOfTasks()) {
@@ -197,8 +197,10 @@ public class StatusService {
     }
 
     public LimitDetailsDTO checkExceedLimit(String boardId,Config config) {
+        System.out.println(config);
+        System.out.println(boardId);
         Config oldConfig = getLimitConfig(boardId);
-        oldConfig.setLimitmaximumTask(config.getLimitmaximumTask());
+        oldConfig.setLimitMaximumTask(config.getLimitMaximumTask());
         oldConfig.setNoOfTasks(config.getNoOfTasks());
 
         configRepository.saveAndFlush(oldConfig);
@@ -220,7 +222,7 @@ public class StatusService {
         }
         statusTaskLimitDTO.setStatusList(statusTasksNumDTO);
         statusTaskLimitDTO.setNoOfTasks(config.getNoOfTasks());
-        statusTaskLimitDTO.setLimitMaximumTask(config.getLimitmaximumTask());
+        statusTaskLimitDTO.setLimitMaximumTask(config.getLimitMaximumTask());
         return statusTaskLimitDTO;
     }
 

@@ -22,11 +22,14 @@ public class DefaultStatus {
     @Column(name = "statusColor")
     private String statusColor;
 
-    @Column(name = "createdOn", nullable = false, insertable = true, updatable = true)
+
+    @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
     private Timestamp createdOn;
 
-    @Column(name = "updatedOn", nullable = false, insertable = true, updatable = true)
+    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
     private Timestamp updatedOn;
+
+
     @Column(name = "statusDescription")
     private String statusDescription;
 

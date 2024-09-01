@@ -32,24 +32,13 @@ public class Status {
     private Board board;
 
 
-    @Column(name = "createdOn")
+
+    @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
     private Timestamp createdOn;
 
-    @Column(name = "updatedOn")
+    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
     private Timestamp updatedOn;
 
-    private static final ZoneId SYSTEM_ZONE = ZoneId.systemDefault();
-    @PrePersist
-    protected void onCreate() {
-        ZonedDateTime now = ZonedDateTime.now(SYSTEM_ZONE);
-        this.createdOn = Timestamp.from(now.toInstant());
-        this.updatedOn = this.createdOn;
-    }
 
-    @PreUpdate
-    protected void onUpdate() {
-        ZonedDateTime now = ZonedDateTime.now(SYSTEM_ZONE);
-        this.updatedOn = Timestamp.from(now.toInstant());
-    }
 
 }

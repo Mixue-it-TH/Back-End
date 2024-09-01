@@ -8,9 +8,6 @@ import java.util.List;
 public class LimitDetailsDTO {
     private Integer limitMaximumTask;
 
-    public Integer getlimitMaximumTask() {
-        return limitMaximumTask;
-    }
     private Integer noOfTasks;
     private List<StatusTasksNumDTO> statusList;
 }

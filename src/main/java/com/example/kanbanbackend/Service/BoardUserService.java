@@ -32,11 +32,9 @@ public class BoardUserService {
         return repository.findAll();
     }
 
-    public List<BoardDTO> getBoardUserById(String  oid){
+    public List<BoardDTO> getBoardUserByUserOid(String  oid){
             List<BoardUser> boardUserList = repository.findBoardUserByUser_Oid(oid);
-            if(boardUserList.isEmpty()){
-                throw new ItemNotFoundException("This user never create the board");
-            }
+
             return listMapper.mapList(boardUserList, BoardDTO.class);
     }
 

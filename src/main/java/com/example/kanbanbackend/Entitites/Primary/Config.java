@@ -18,10 +18,10 @@ public class Config {
 
     private Integer  noOfTasks;
 
-    private Integer limitmaximumTask;
+    private Integer limitMaximumTask;
 
     public Config() {
         this.noOfTasks = 5;
-        this.limitmaximumTask = 0;
+        this.limitMaximumTask = 0;
     }
 }

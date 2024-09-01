@@ -126,6 +126,7 @@ public class TaskService {
         newTask.setTaskTitle(newTaskDTO.getTaskTitle() == null ? null : newTaskDTO.getTaskTitle().trim());
         newTask.setTaskDescription(newTaskDTO.getTaskDescription() == null || newTaskDTO.getTaskDescription().isEmpty() ? null : newTaskDTO.getTaskDescription().trim());
         newTask.setTaskAssignees(newTaskDTO.getTaskAssignees() == null || newTaskDTO.getTaskAssignees().isEmpty() ? null : newTaskDTO.getTaskAssignees().trim());
+        System.out.println(newTask);
         repository.saveAndFlush(newTask);
         Status status = mapper.map(statusfind, Status.class);
         newTask.setTaskStatus(status);

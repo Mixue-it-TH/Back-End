@@ -36,8 +36,13 @@ public class BoardUserController {
         return ResponseEntity.ok(service.getAllBoardUser());
     }
 
+    @GetMapping("/user/{oid}")
+    public ResponseEntity<Object> getBoardUserByUserOID(@PathVariable String oid){
+        return ResponseEntity.ok(service.getBoardUserByUserOid(oid));
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getBoardUserById(@PathVariable String id) {
+    public ResponseEntity<Object> getBoardUserByBoardId(@PathVariable String id) {
         System.out.println(id);
         return ResponseEntity.ok(boardService.getBoardUserByBoardId(id));
     }

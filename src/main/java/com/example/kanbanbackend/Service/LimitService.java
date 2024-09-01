@@ -24,7 +24,7 @@ public class LimitService {
         Board board = boardRepository.findBoardById(boardId);
         if(board == null) throw new ItemNotFoundException("Board id "+ boardId +" doesn't exist!");
         Config LimitConfig = board.getConfigId();
-        if (LimitConfig.getLimitmaximumTask() != 0) {
+        if (LimitConfig.getLimitMaximumTask() != 0) {
             List<Task> listTasks = taskRepository.findByTaskStatusId(statusId);
             if (listTasks.size() >= LimitConfig.getNoOfTasks()) {
                 throw new BadRequestException("The Status has on the limit (" + LimitConfig.getNoOfTasks() + ")s You can't edit !!!");
