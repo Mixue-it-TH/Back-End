@@ -52,6 +52,8 @@ public class BoardService {
         User user = primaryUserRepository.saveAndFlush(new User(oid,claims.getSubject(),email));
         System.out.println("User: "+user);
 
+        String nanoId = NanoId.generate(10);
+
         System.out.println(NanoId.generate(10));
         Board newBoard = boardRepository.saveAndFlush(new Board(NanoId.generate(10),boardDTO.getBoardName(),config));
         System.out.println("Board: "+newBoard);
