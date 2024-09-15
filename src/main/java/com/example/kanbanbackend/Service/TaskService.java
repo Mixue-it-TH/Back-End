@@ -174,7 +174,7 @@ public class TaskService {
     @Transactional
     public TaskDTO deleteTask(String boardId,Integer delId) {
         Task delTask = repository.findTaskByBoard_IdAndId(boardId, delId);
-        if (delTask == null) throw new ItemNotFoundDelUpdate("NOT FOUND");
+        if (delTask == null) throw new ItemNotFoundException("Task id: " + delId + " or boardId: "+ boardId +" doesn't exist !!!");
 
 
         repository.delete(delTask);

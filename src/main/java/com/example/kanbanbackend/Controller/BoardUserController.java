@@ -59,7 +59,7 @@ public class BoardUserController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> createBoardUser(@RequestBody BoardDTO boardDTO, HttpServletRequest request) {
+    public ResponseEntity<Object> createBoardUser(@Valid @RequestBody BoardDTO boardDTO, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(boardService.createBoardUser(boardDTO, request));
     }
 

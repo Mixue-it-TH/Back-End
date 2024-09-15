@@ -50,16 +50,11 @@ public class BoardService {
         String email = claims.get("email",String.class);
         String role = claims.get("role", String.class);
         User user = primaryUserRepository.saveAndFlush(new User(oid,claims.getSubject(),email));
-        System.out.println("User: "+user);
 
-        String nanoId = NanoId.generate(10);
 
-        System.out.println(NanoId.generate(10));
         Board newBoard = boardRepository.saveAndFlush(new Board(NanoId.generate(10),boardDTO.getBoardName(),config));
-        System.out.println("Board: "+newBoard);
 
         BoardUser boardUser = boardUserRepository.saveAndFlush(new BoardUser(user,newBoard,role));
-        System.out.println("BoardUser: "+boardUser);
 
 
 
@@ -72,7 +67,6 @@ public class BoardService {
             customStatus.setCreatedOn(Timestamp.valueOf(defaultStatus.getCreatedOn().toLocalDateTime()));
             customStatus.setUpdatedOn(Timestamp.valueOf(defaultStatus.getUpdatedOn().toLocalDateTime()));
             customStatus.setBoard(newBoard);// Associate CustomStatus with the new Board
-            System.out.println(customStatus);
             statusRepository.save(customStatus);
         }
         return mapper.map(boardUser, BoardDTO.class);

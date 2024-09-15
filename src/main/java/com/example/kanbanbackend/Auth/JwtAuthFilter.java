@@ -60,13 +60,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "JWT token is expired", request);
                     return;
                 } catch (MalformedJwtException e) {
-                    sendErrorResponse(response, HttpStatus.BAD_REQUEST, "Malformed JWT token", request);
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Malformed JWT token", request);
                     return;
                 } catch (UnsupportedJwtException e) {
-                    sendErrorResponse(response, HttpStatus.BAD_REQUEST, "Unsupported JWT token", request);
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Unsupported JWT token", request);
                     return;
                 } catch (IllegalArgumentException e) {
-                    sendErrorResponse(response, HttpStatus.BAD_REQUEST, "JWT token is missing or invalid", request);
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "JWT token is missing or invalid", request);
                     return;
                 }
             } else {
