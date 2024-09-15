@@ -22,6 +22,7 @@ import java.util.HashMap;
 @EnableTransactionManagement
 @EnableJpaRepositories(
         entityManagerFactoryRef = "entityManagerFactory",
+        transactionManagerRef = "transactionManager",
         basePackages = {
                 "com.example.kanbanbackend.Repository.Primary"
         }

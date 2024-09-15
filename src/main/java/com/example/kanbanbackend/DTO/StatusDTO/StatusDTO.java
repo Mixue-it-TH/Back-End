@@ -19,6 +19,7 @@ public class StatusDTO {
     private String statusDescription;
 
     @JsonProperty("statusColor")
+    @Size(max = 7)
     private String statusColor;
 
 

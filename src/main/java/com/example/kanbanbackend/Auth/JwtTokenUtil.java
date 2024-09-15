@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    @Value("${jwt.max-token-interval-hour}")
+    @Value("#{${jwt.max-token-interval-minutes}*60*1000}")
     private long JWT_TOKEN_VALIDITY;
 
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -46,16 +47,17 @@ public class JwtTokenUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) {
-        try {
+    public Claims getAllClaimsFromToken(String token) {
+//        try {
             return Jwts.parser()
                     .setSigningKey(SECRET_KEY)
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid JWT token", e);
         }
-    }
+//        catch (Exception e) {
+//            throw new RuntimeException("Invalid JWT token", e);
+//        }
+//    }
 
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
@@ -74,12 +76,13 @@ public class JwtTokenUtil implements Serializable {
 
     // Generate JWT token with claims(any config) and subject(username)
     private String doGenerateToken(Map<String, Object> claims, String subject) {
+        long expirationTime = (long) Math.floor(System.currentTimeMillis() + JWT_TOKEN_VALIDITY);
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT") // Add header
                 .setClaims(claims) // Set claims
                 .setSubject(subject) // Set the subject (username)
                 .setIssuedAt(new Date()) // Set issued date
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY)) // Set expiration date
+                .setExpiration(new Date(expirationTime)) // Set expiration date
                 .signWith(signatureAlgorithm, SECRET_KEY) // Sign the token with the secret key
                 .compact();
     }

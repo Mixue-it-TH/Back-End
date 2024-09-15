@@ -54,18 +54,15 @@ public class UserService {
         User user = repository.findUsersByUsername(userData.getUserName());
         if(user == null) throw new UnauthorizedException("Username or Password is incorrect");
 
-        UsernamePasswordAuthenticationToken authenticationToken =
+            UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userData.getUserName(), userData.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
             if (!authentication.isAuthenticated()) {
                 throw new UsernameNotFoundException("Invalid user or password");
             }
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String tokenGenarate = jwtTokenUtil.generateToken(user);
-        Token token = new Token();
-        token.setAccess_token(tokenGenarate);
-        return  token;
+        return  new Token(tokenGenarate);
     }
 
     public User loadUserByUserName(String username) {

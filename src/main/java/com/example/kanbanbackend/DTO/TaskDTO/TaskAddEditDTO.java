@@ -24,4 +24,6 @@ public class TaskAddEditDTO {
 
     @JsonProperty("status")
     private Integer taskStatusId;
+
+    private String boardId;
 }

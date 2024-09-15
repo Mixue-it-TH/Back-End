@@ -1,6 +1,9 @@
 package com.example.kanbanbackend.Auth;
 
+import com.example.kanbanbackend.Exception.ErrorResponse;
+import com.example.kanbanbackend.Exception.ErrorValidationResponse;
 import com.example.kanbanbackend.Service.JwtUserDetailsService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -23,6 +26,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.security.SignatureException;
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -45,12 +53,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 jwtToken = requestTokenHeader.substring(7);
                 try {
                     username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-                } catch (IllegalArgumentException e) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+                } catch (io.jsonwebtoken.SignatureException e) {
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Invalid JWT signature", request);
+                    return;
                 } catch (ExpiredJwtException e) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "JWT token is expired", request);
+                    return;
+                } catch (MalformedJwtException e) {
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Malformed JWT token", request);
+                    return;
+                } catch (UnsupportedJwtException e) {
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Unsupported JWT token", request);
+                    return;
+                } catch (IllegalArgumentException e) {
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "JWT token is missing or invalid", request);
+                    return;
                 }
             } else {
+                System.out.println("XDD" + requestTokenHeader);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "JWT Token does not begin with Bearer String");
             }
         }
@@ -63,5 +83,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
+    }
+    private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message, HttpServletRequest request) throws IOException {
+        String timeStamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+//        ErrorValidationResponse errorValidationResponse = new ErrorValidationResponse(status.value(), message, null);
+        ErrorResponse errorResponse = new ErrorResponse(timeStamp,status.value(),status.getReasonPhrase(),message,request.getRequestURI());
+        response.setStatus(status.value());
+        response.setContentType("application/json");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
     }
 }
