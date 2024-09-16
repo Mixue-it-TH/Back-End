@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = {"http://ip23sy2.sit.kmutt.ac.th","http://intproj23.sit.kmutt.ac.th","http://localhost:5173"})
 @RequestMapping("/v2/statuses")
 public class StatusController {
-//    @Autowired
-//    private StatusService service;
-//
-//    @GetMapping("")
-//    public ResponseEntity<Object> getAllStatus(){
-//        return ResponseEntity.ok(service.getAllStatus());
-//    }
+    @Autowired
+    private StatusService service;
+
+    @GetMapping("")
+    public ResponseEntity<Object> getAllStatus(){
+        return ResponseEntity.ok(service.getAllStatus());
+    }
 //
 //    @GetMapping("/islimit")
 //    public ResponseEntity<Object> getLimitConfig(){
@@ -57,6 +57,6 @@ public class StatusController {
 //    public ResponseEntity<Object> statusLimitConfig(@RequestBody LimitConfigDTO status){
 //        return ResponseEntity.ok(service.checkExceedLimit(status));
 //    }
-//
+
 
 }

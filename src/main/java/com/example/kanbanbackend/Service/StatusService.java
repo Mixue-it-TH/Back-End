@@ -54,6 +54,12 @@ public class StatusService {
     @Autowired
     private Permission permission;
 
+
+    public List<StatusDTO> getAllStatus() {
+        List<Status> statuses = repository.findAll();
+        return listMapper.mapList(statuses, StatusDTO.class);
+    }
+
     public List<StatusDTO> getAllStatusByBoardId(String boardId) {
         List<Status> status = repository.findStatusByBoard_Id(boardId);
         return listMapper.mapList(status, StatusDTO.class);
@@ -124,7 +130,7 @@ public class StatusService {
 
         Status oldStatus = repository.findStatusByBoard_IdAndId(boardId, statusId);
         if (oldStatus == null)
-            throw new ItemNotFoundException("Status id " + statusId + " or Board id" + boardId + " does not exist");
+            throw new ItemNotFoundException("Status id " + statusId + " or Board id " + boardId + " does not exist");
 
         if (isDuplicate != null && (!oldStatus.getStatusName().equalsIgnoreCase(editedStatus.getStatusName()))) {
             throw new BadRequestWithFieldException("name", "must be unique");
@@ -139,7 +145,7 @@ public class StatusService {
     @Transactional
     public void deleteStatus(String boardId, Integer delId) {
         Status statusDel = repository.findStatusByBoard_IdAndId(boardId,delId);
-        if(statusDel == null) throw new ItemNotFoundDelUpdate("NOT FOUND ");
+        if(statusDel == null) throw new ItemNotFoundDelUpdate("Status id " + delId + " or Board id " + boardId + " does not exist");
 
         List<Task> taskStillUse = taskRepository.findByTaskStatus(statusDel);
         if (!taskStillUse.isEmpty()) {
@@ -175,7 +181,7 @@ public class StatusService {
             List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
             List<Task> listTasksTransfer = taskRepository.findByTaskStatus(statusTranfer);
             if ((listTasks.size() + listTasksTransfer.size()) > config.getNoOfTasks()) {
-                throw new BadRequestException("You can't delete" + statusDel.getStatusName() + " xhave on the limit");
+                throw new BadRequestException("You can't delete" + statusDel.getStatusName() + " have on the limit");
             }
         }
         if (statusDel != null && statusTranfer != null) {
