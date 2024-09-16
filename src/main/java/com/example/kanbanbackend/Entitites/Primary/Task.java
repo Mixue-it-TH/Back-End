@@ -28,9 +28,9 @@ public class Task {
     @JoinColumn(name = "statusId")
     private Status taskStatus;
 
-        @ManyToOne(fetch = FetchType.EAGER)
-        @JoinColumn(name="boardId")
-        private Board board;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="boardId")
+    private Board board;
 
 
     @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
