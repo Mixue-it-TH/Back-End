@@ -34,6 +34,8 @@ public class BoardService {
     private DefaultStatusRepository defaultStatusRepository;
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private JwtTokenUtil tokenUtil;
@@ -69,6 +71,8 @@ public class BoardService {
             customStatus.setBoard(newBoard);// Associate CustomStatus with the new Board
             statusRepository.save(customStatus);
         }
+
+
         return mapper.map(boardUser, BoardDTO.class);
     }
 
