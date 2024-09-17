@@ -39,6 +39,13 @@ public class Task {
     @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
     private Timestamp updatedOn;
 
-
-
+    public Task() {
+    }
+    public Task(String taskTitle, String taskDescription, String taskAssignees, Status taskStatus, Board board) {
+        this.taskTitle = taskTitle;
+        this.taskDescription = taskDescription;
+        this.taskAssignees = taskAssignees;
+        this.taskStatus = taskStatus;
+        this.board = board;
+    }
 }
