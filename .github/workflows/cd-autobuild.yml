@@ -27,3 +27,4 @@ jobs:
 
     - name: Push Docker image tag:version
       run: docker push xsmity01/task-backend:version${{ github.run_number }}
+
