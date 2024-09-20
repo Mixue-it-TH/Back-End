@@ -43,6 +43,8 @@ public class BoardService {
         String token = request.getHeader("Authorization").substring(7).trim();;
 
         Claims claims = tokenUtil.getAllClaimsFromToken(token);
+        System.out.println(claims.getSubject());
+
 
         Config config = configRepository.saveAndFlush(new Config());
 
