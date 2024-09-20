@@ -13,19 +13,19 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = {"http://ip23sy2.sit.kmutt.ac.th","http://intproj23.sit.kmutt.ac.th","http://localhost:5173"})
-@RequestMapping("/v3/boards")
+@RequestMapping("/v2/tasks")
 public class TaskController {
     @Autowired
     private TaskService service;
 
 
-//    @GetMapping("")
-//    public ResponseEntity<Object> getAllTask(@RequestParam(required = false) List<String> filterStatuses,
-//                                             @RequestParam(defaultValue = "id")String sortBy,
-//                                             @RequestParam(defaultValue = "ASC")String sortDirection){
-//        return ResponseEntity.ok(service.getAllTodo(filterStatuses,sortBy,sortDirection));
-//    }
-//
+    @GetMapping("")
+    public ResponseEntity<Object> getAllTask(@RequestParam(required = false) List<String> filterStatuses,
+                                             @RequestParam(defaultValue = "id")String sortBy,
+                                             @RequestParam(defaultValue = "ASC")String sortDirection){
+        return ResponseEntity.ok(service.getAllTodo(filterStatuses,sortBy,sortDirection));
+    }
+
 //
 //
 //    @GetMapping("/{id}")
