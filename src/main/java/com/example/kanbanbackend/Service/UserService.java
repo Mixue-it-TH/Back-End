@@ -8,6 +8,8 @@ import com.example.kanbanbackend.Entitites.Share.User;
 import com.example.kanbanbackend.Exception.UnauthorizedException;
 import com.example.kanbanbackend.Repository.Share.UserRepository;
 import com.example.kanbanbackend.Auth.JwtTokenUtil;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -62,8 +64,23 @@ public class UserService {
             }
 
         String tokenGenarate = jwtTokenUtil.generateToken(user);
+        String refreshToken = jwtTokenUtil.generateRefreshToken(user);
+        return  new Token(tokenGenarate, refreshToken);
+    }
+
+    public Token refreshLogin(String accessToken, HttpServletRequest request) {
+        // check is user is exist on the DB
+        String token = request.getHeader("Authorization").substring(7).trim();
+        Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
+        User user = repository.findUserByOid(claims.get("oid").toString());
+        System.out.println(user);
+        if(user == null) throw new UnauthorizedException("Username or Password is incorrect");
+
+        String tokenGenarate = jwtTokenUtil.generateToken(user);
+
         return  new Token(tokenGenarate);
     }
+
 
     public User loadUserByUserName(String username) {
 

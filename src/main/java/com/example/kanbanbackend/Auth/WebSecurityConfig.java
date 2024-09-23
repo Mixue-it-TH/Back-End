@@ -32,7 +32,8 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(
-                        authorize -> authorize.requestMatchers("/login").permitAll()
+                        authorize -> authorize.requestMatchers("/login", "/login/token").permitAll()
+//                                .requestMatchers("/v3/boards/**").hasAnyRole("owner")
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults());

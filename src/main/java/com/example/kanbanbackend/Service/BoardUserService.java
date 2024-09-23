@@ -34,7 +34,6 @@ public class BoardUserService {
 
     public List<BoardDTO> getBoardUserByUserOid(String  oid){
             List<BoardUser> boardUserList = repository.findBoardUserByUser_Oid(oid);
-
             return listMapper.mapList(boardUserList, BoardDTO.class);
     }
 

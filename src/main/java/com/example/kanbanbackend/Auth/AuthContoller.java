@@ -4,6 +4,7 @@ package com.example.kanbanbackend.Auth;
 import com.example.kanbanbackend.DTO.Token;
 import com.example.kanbanbackend.Entitites.Share.User;
 import com.example.kanbanbackend.Service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,10 @@ public class AuthContoller {
     @PostMapping("")
     public ResponseEntity<Token> Login(@Valid @RequestBody JwtRequestUser user) {
         return ResponseEntity.ok(service.login(user));
+    }
+    @PostMapping("/token")
+    public ResponseEntity<Token> refreshTokenLogin(String token, HttpServletRequest request) {
+         return ResponseEntity.ok(service.refreshLogin(token, request));
     }
 
     @PostMapping("/create")

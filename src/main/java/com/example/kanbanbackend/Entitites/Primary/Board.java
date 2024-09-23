@@ -4,6 +4,8 @@ import io.viascom.nanoid.NanoId;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "boards")
@@ -19,10 +21,14 @@ public class Board {
     @JoinColumn(name = "configId")
     private Config configId;
 
-    public Board(String id,String boardName, Config configId) {
+    @Enumerated(EnumType.STRING)  // Store as a String in the DB
+    private Visibility visibility;
+
+    public Board(String id,String boardName, Config configId, Visibility visibility) {
         this.id = id;
         this.boardName = boardName;
         this.configId = configId;
+        this.visibility = visibility;
     }
 
     public Board() {
