@@ -75,7 +75,6 @@ public class StatusService {
         Status status = repository.findStatusByBoard_IdAndId(boardId, id);
         if (status == null)
             throw new ItemNotFoundException("Status id " + id + " or Board id" + boardId + " does not exist");
-        Claims claims = jwtTokenUtil.decodedToken(request);
             // Assuming `getCreatedOn` and `getUpdatedOn` return `Timestamp`
             Timestamp createdOnTimestamp = status.getCreatedOn();
             Timestamp updatedOnTimestamp = status.getUpdatedOn();
