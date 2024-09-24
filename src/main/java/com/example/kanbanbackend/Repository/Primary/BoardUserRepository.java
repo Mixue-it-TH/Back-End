@@ -11,4 +11,6 @@ public interface BoardUserRepository extends JpaRepository<BoardUser, BoardUserK
     List<BoardUser>findBoardUserByUser_Oid(String oid);
 
     List<BoardUser> findBoardUserByBoard_Id(String boardId);
+
+   BoardUser findBoardUserByBoard_IdAndUser_Oid(String boardId, String userId);
 }

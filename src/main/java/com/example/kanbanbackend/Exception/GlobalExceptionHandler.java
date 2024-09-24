@@ -76,7 +76,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(Exception exception, HttpServletRequest request) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         ErrorResponse errorResponse = new ErrorResponse(timestamp,HttpStatus.NOT_FOUND.value(),HttpStatus.NOT_FOUND.name(), "Endpoint not found", request.getRequestURI());
-
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
@@ -86,6 +85,13 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(timestamp,HttpStatus.BAD_REQUEST.value(),HttpStatus.BAD_REQUEST.name(), "request body not found", request.getRequestURI());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ForBiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForBiddenException exception, HttpServletRequest request) {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        ErrorResponse errorResponse = new ErrorResponse(timestamp,HttpStatus.FORBIDDEN.value(),HttpStatus.FORBIDDEN.name(), exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)

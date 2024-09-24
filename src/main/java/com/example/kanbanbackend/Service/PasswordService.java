@@ -24,8 +24,6 @@ public class PasswordService {
     }
 
     public boolean verifyPassword(String plainPassword, String hashedPassword) {
-        System.out.println(plainPassword);
-        System.out.println(hashedPassword);
         return passwordEncoder.matches(plainPassword, hashedPassword);
     }
 }
