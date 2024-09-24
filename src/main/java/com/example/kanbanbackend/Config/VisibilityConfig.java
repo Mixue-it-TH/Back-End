@@ -24,6 +24,7 @@ public class VisibilityConfig {
 
     public boolean visibilityType(String boardId){
         Board board = boardRepository.findBoardById(boardId);
+
         if(board == null){
             throw new ItemNotFoundException("Board id '"+boardId+"' not found");
         }

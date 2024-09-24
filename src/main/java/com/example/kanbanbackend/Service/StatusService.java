@@ -184,7 +184,7 @@ public class StatusService {
 
             if (config.getLimitMaximumTask() == 1) {
                 List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
-                System.out.println(listTasks);
+
                 if (listTasks.size() >= config.getNoOfTasks()) {
                     throw new BadRequestException("You can't delete" + statusDel.getStatusName() + "have on the limit");
                 }
@@ -244,8 +244,6 @@ public class StatusService {
     }
 
     public LimitDetailsDTO checkExceedLimit(String boardId,Config config,HttpServletRequest request) {
-        System.out.println(config);
-        System.out.println(boardId);
         Claims claims = jwtTokenUtil.decodedToken(request);
         if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
             Config oldConfig = getLimitConfig(boardId,request);

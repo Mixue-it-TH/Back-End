@@ -39,8 +39,6 @@ public class BoardService {
     private DefaultStatusRepository defaultStatusRepository;
     @Autowired
     private StatusRepository statusRepository;
-    @Autowired
-    private TaskRepository taskRepository;
 
     @Autowired
     private JwtTokenUtil tokenUtil;
@@ -89,6 +87,7 @@ public class BoardService {
             throw new ItemNotFoundException("Board id '" + boardId + "' not found");
         }
         Claims claims = tokenUtil.decodedToken(request);
+
         if(visibilityConfig.visibilityType(boardId) || permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
             return listMapper.mapList(boardUserList, BoardDTO.class);
         }else{

@@ -106,7 +106,6 @@ public class TaskService {
             // Convert LocalDateTime to ZonedDateTime in UTC
             ZonedDateTime createdUTC = createdDateTime.atZone(ZoneOffset.UTC);
             ZonedDateTime updatedUTC = updatedDateTime.atZone(ZoneOffset.UTC);
-            System.out.println(createdUTC);
 
             // Convert ZonedDateTime to ISO 8601 format string
             String createdOnISO = createdUTC.format(DateTimeFormatter.ISO_INSTANT);
@@ -143,7 +142,6 @@ public class TaskService {
             newTask.setTaskTitle(newTaskDTO.getTaskTitle() == null ? null : newTaskDTO.getTaskTitle().trim());
             newTask.setTaskDescription(newTaskDTO.getTaskDescription() == null || newTaskDTO.getTaskDescription().isEmpty() ? null : newTaskDTO.getTaskDescription().trim());
             newTask.setTaskAssignees(newTaskDTO.getTaskAssignees() == null || newTaskDTO.getTaskAssignees().isEmpty() ? null : newTaskDTO.getTaskAssignees().trim());
-            System.out.println(newTask);
             repository.saveAndFlush(newTask);
             Status status = mapper.map(statusfind, Status.class);
             newTask.setTaskStatus(status);
@@ -215,7 +213,7 @@ public class TaskService {
 
     // Version 3
 
-    public List<TaskBoardDTO> getTaskofBoard(String boardId, HttpServletRequest request) {
+    public List<TaskBoardDTO>   getTaskofBoard(String boardId, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7).trim();
         Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
         if(visibilityConfig.visibilityType(boardId)  || permission.getRoleOfBoard(boardId, claims.get("oid").toString())){

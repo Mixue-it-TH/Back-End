@@ -68,7 +68,7 @@ public class UserService {
         return  new Token(tokenGenarate, refreshToken);
     }
 
-    public Token refreshLogin(String accessToken, HttpServletRequest request) {
+    public Token refreshLogin( HttpServletRequest request) {
         // check is user is exist on the DB
         String token = request.getHeader("Authorization").substring(7).trim();
         Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
