@@ -1,9 +1,13 @@
 package com.example.kanbanbackend.Auth;
 
+import com.example.kanbanbackend.Config.Permission;
+import com.example.kanbanbackend.Config.VisibilityConfig;
 import com.example.kanbanbackend.Exception.ErrorResponse;
 import com.example.kanbanbackend.Exception.ErrorValidationResponse;
+import com.example.kanbanbackend.Exception.ForBiddenException;
 import com.example.kanbanbackend.Service.JwtUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -30,6 +34,7 @@ import java.security.SignatureException;
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Date;
 
 @Component
@@ -40,6 +45,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private Permission permission;
+    @Autowired
+    private VisibilityConfig visibilityConfig;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -48,6 +58,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
         String jwtToken = null;
+
+
+        if(request.getRequestURI().equals("/login") || request.getRequestURI().equals("/login/token")) { //handle ให้ login โดยไม่มี token ได้
+            chain.doFilter(request, response);
+            return;
+        }
+
+
+
         if (requestTokenHeader != null) {
             if (requestTokenHeader.startsWith("Bearer ")) {
                 jwtToken = requestTokenHeader.substring(7);
@@ -69,9 +88,43 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "JWT token is missing or invalid", request);
                     return;
                 }
+                if(request.getMethod().equals("POST") && request.getRequestURI().equals("/v3/boards")) {
+                    chain.doFilter(request, response);
+                    return;
+                }
+
+                String boardId = request.getRequestURI().split("/").length >= 3 ? request.getRequestURI().split("/")[3] : request.getRequestURI().split("/")[2];
+                Claims claims = jwtTokenUtil.decodedToken(request);
+
+                if(permission.getRoleOfBoard(boardId,claims.get("oid").toString())){ //handle ให้ role owner เข้าใช้งานได้เลย
+                    chain.doFilter(request, response);
+                    return;
+                }
+
+                if(request.getRequestURI().contains("/v3/boards/user")) { //handle getBoardLiast ของ user เพื่อไม่ไปทับลายกับ get method อื่นๆด้านล่าง
+                    chain.doFilter(request, response);
+                    return;
+                }
+
+                if(request.getMethod().equals("GET") && visibilityConfig.visibilityType(boardId)){ //handle กรณีไม่ login เข้ามาและดู board public ได้เลย
+                    chain.doFilter(request, response);
+                    return;
+                }
+                else {
+                    sendErrorResponse(response, HttpStatus.FORBIDDEN,"You do not have permission to access this resource", request);
+                    return;
+                }
             } else {
-                System.out.println("XDD" + requestTokenHeader);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "JWT Token does not begin with Bearer String");
+            }
+        }else if(requestTokenHeader == null) {
+            String boardId = request.getRequestURI().split("/")[3];
+            if(request.getMethod().equals("GET") && visibilityConfig.visibilityType(boardId)){
+                chain.doFilter(request, response);
+                return;
+            }else {
+                sendErrorResponse(response, HttpStatus.FORBIDDEN,"You do not have permission to access this resource", request);
+                return;
             }
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

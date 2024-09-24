@@ -88,7 +88,6 @@ public class JwtTokenUtil implements Serializable {
     private String doGenerateToken(Map<String, Object> claims, String subject, long expiration) {
         long expirationTime = (long) Math.floor(System.currentTimeMillis() + expiration);
         if(claims.size() > 2){//gen access_token
-            System.out.println("XD");
             return Jwts.builder()
                     .setHeaderParam("typ", "JWT") // Add header
                     .setClaims(claims) // Set claims
@@ -98,7 +97,6 @@ public class JwtTokenUtil implements Serializable {
                     .signWith(signatureAlgorithm, SECRET_KEY) // Sign the token with the secret key
                     .compact();
         }else { // gen refresh_token
-            System.out.println("AHA");
             return Jwts.builder()
                     .setHeaderParam("typ", "JWT") // Add header
                     .setClaims(claims) // Set claims

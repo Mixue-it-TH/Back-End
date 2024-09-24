@@ -66,13 +66,8 @@ public class StatusService {
     }
 
     public List<StatusDTO> getAllStatusByBoardId(String boardId, HttpServletRequest request) {
-        Claims claims = jwtTokenUtil.decodedToken(request);
-        if(visibilityConfig.visibilityType(boardId) || permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
             List<Status> status = repository.findStatusByBoard_Id(boardId);
             return listMapper.mapList(status, StatusDTO.class);
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
 
     }
 
@@ -81,7 +76,6 @@ public class StatusService {
         if (status == null)
             throw new ItemNotFoundException("Status id " + id + " or Board id" + boardId + " does not exist");
         Claims claims = jwtTokenUtil.decodedToken(request);
-        if(visibilityConfig.visibilityType(boardId)  || permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
             // Assuming `getCreatedOn` and `getUpdatedOn` return `Timestamp`
             Timestamp createdOnTimestamp = status.getCreatedOn();
             Timestamp updatedOnTimestamp = status.getUpdatedOn();
@@ -105,9 +99,6 @@ public class StatusService {
             dto.setUpdatedOn(updatedOnISO);
 
             return dto;
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
 
     }
 
@@ -120,7 +111,6 @@ public class StatusService {
         if (board == null) throw new ItemNotFoundException("Board id " + boardId + "doesn't exist!!");
 
         Claims claims = jwtTokenUtil.decodedToken(request);
-        if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
             Status status = mapper.map(newStatusDTO, Status.class);
 
             if (status.getStatusColor() == null || status.getStatusColor().isBlank()) {
@@ -135,9 +125,7 @@ public class StatusService {
             status.setBoard(board);
             repository.saveAndFlush(status);
             return mapper.map(status, StatusDTO.class);
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
+
     }
 
     @Transactional
@@ -146,7 +134,6 @@ public class StatusService {
 //            throw new BadRequestException("No Status cannot be modified. and Done cannot be modified. respectively.");
 //        }
         Claims claims = jwtTokenUtil.decodedToken(request);
-        if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
             Status isDuplicate = repository.findStatusByStatusNameAndBoard_Id(boardId, editedStatus.getStatusName());
 
             Status oldStatus = repository.findStatusByBoard_IdAndId(boardId, statusId);
@@ -161,9 +148,6 @@ public class StatusService {
             oldStatus.setStatusColor(editedStatus.getStatusColor() != null ? editedStatus.getStatusColor() : oldStatus.getStatusColor());
             repository.save(oldStatus);
             return mapper.map(oldStatus, StatusDTO.class);
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
 
     }
 
@@ -172,8 +156,6 @@ public class StatusService {
         Status statusDel = repository.findStatusByBoard_IdAndId(boardId,delId);
         if(statusDel == null) throw new ItemNotFoundDelUpdate("Status id " + delId + " or Board id " + boardId + " does not exist");
 
-        Claims claims = jwtTokenUtil.decodedToken(request);
-        if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
             List<Task> taskStillUse = taskRepository.findByTaskStatus(statusDel);
             if (!taskStillUse.isEmpty()) {
                 throw new BadRequestException("destination cannot be " + statusDel.getStatusName() + " for task transfer not specified.");
@@ -190,10 +172,6 @@ public class StatusService {
                 }
             }
             repository.delete(statusDel);
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
-
     }
 
     @Transactional
@@ -207,8 +185,6 @@ public class StatusService {
         Status statusTranfer = repository.findStatusByBoard_IdAndId(boardId,tranferId);
         if(statusTranfer == null) throw new ItemNotFoundDelUpdate("the specified status for task transfer does not exist. ");
 
-        Claims claims = jwtTokenUtil.decodedToken(request);
-        if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
             Config config = getLimitConfig(boardId,request);
             if(config.getLimitMaximumTask() == 1) {
                 List<Task> listTasks = taskRepository.findByTaskStatus(statusDel);
@@ -225,27 +201,17 @@ public class StatusService {
                 });
                 repository.delete(statusDel);
             }
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
     }
 
     public Config getLimitConfig(String boardId, HttpServletRequest request) {
-        Claims claims = jwtTokenUtil.decodedToken(request);
-        if(visibilityConfig.visibilityType(boardId) || permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
             Board board = boardRepository.findBoardById(boardId);
             if(board == null) throw new ItemNotFoundException("Board id "+ boardId +" doesn't exist!");
 
             return board.getConfigId();
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
 
     }
 
     public LimitDetailsDTO checkExceedLimit(String boardId,Config config,HttpServletRequest request) {
-        Claims claims = jwtTokenUtil.decodedToken(request);
-        if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
             Config oldConfig = getLimitConfig(boardId,request);
             oldConfig.setLimitMaximumTask(config.getLimitMaximumTask());
             oldConfig.setNoOfTasks(config.getNoOfTasks());
@@ -271,9 +237,7 @@ public class StatusService {
             statusTaskLimitDTO.setNoOfTasks(config.getNoOfTasks());
             statusTaskLimitDTO.setLimitMaximumTask(config.getLimitMaximumTask());
             return statusTaskLimitDTO;
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
+
         }
 
 

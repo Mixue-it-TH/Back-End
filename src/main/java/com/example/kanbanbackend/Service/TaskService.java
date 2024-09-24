@@ -92,8 +92,6 @@ public class TaskService {
 //        Task task =  repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Task "+ id +" does not exist !!!" ));
         Task task = repository.findTaskByBoard_IdAndId(boardId, id);
         if (task == null) throw new ItemNotFoundException("Task id: " + id + " or boardId: "+ boardId +" doesn't exist !!!");
-        Claims claims = jwtTokenUtil.decodedToken(request);
-        if(visibilityConfig.visibilityType(boardId)  || permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
             // Assuming `getCreatedOn` and `getUpdatedOn` return `Timestamp`
             Timestamp createdOnTimestamp = task.getCreatedOn();
             Timestamp updatedOnTimestamp = task.getUpdatedOn();
@@ -118,10 +116,6 @@ public class TaskService {
 
             return dto;
 
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
-
     }
 
     @Transactional
@@ -130,8 +124,6 @@ public class TaskService {
         if(board == null) {
             throw new ItemNotFoundException("Board id: " + boardId + " doesn't exist !!!");
         }
-        Claims claims = jwtTokenUtil.decodedToken(request);
-        if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
             Status statusfind = statusRepository.findStatusByBoard_IdAndId(boardId,newTaskDTO.getTaskStatusId());
             if(statusfind == null) throw new BadRequestWithFieldException("status", "Status id "+newTaskDTO.getTaskStatusId()+" or Board id"+ boardId +" does not exist");
 
@@ -146,10 +138,7 @@ public class TaskService {
             Status status = mapper.map(statusfind, Status.class);
             newTask.setTaskStatus(status);
             return mapper.map(newTask, TaskDTO.class);
-        }else {
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
-
+        
     }
 
     @Transactional
@@ -166,7 +155,7 @@ public class TaskService {
         if (oldTask == null) throw new ItemNotFoundException("Task id: " + taskId + " or boardId: "+ boardId +" doesn't exist !!!");
 
         Claims claims = jwtTokenUtil.decodedToken(request);
-        if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
+
             Optional.ofNullable(editedTask.getTaskTitle())
                     .map(String::trim)
                     .ifPresent(editedTask::setTaskTitle);
@@ -191,9 +180,7 @@ public class TaskService {
             dto.setTaskStatus(newStatus);
 
             return mapper.map(dto, TaskDTO.class);
-        }else {
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
+
 
     }
 
@@ -202,29 +189,20 @@ public class TaskService {
         Task delTask = repository.findTaskByBoard_IdAndId(boardId, delId);
         if (delTask == null) throw new ItemNotFoundException("Task id: " + delId + " or boardId: "+ boardId +" doesn't exist !!!");
         Claims claims = jwtTokenUtil.decodedToken(request);
-        if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
             repository.delete(delTask);
             return mapper.map(delTask, TaskDTO.class);
-        }else {
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
 
     }
 
     // Version 3
 
-    public List<TaskBoardDTO>   getTaskofBoard(String boardId, HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7).trim();
-        Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
-        if(visibilityConfig.visibilityType(boardId)  || permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
+    public List<TaskBoardDTO>getTaskofBoard(String boardId, HttpServletRequest request) {
+
             List<Task> taskBoard = repository.findTaskByBoard_Id(boardId);
             if (taskBoard.isEmpty()) {
                 throw new BadRequestException("This board has no task !!");
             }
             return listMapper.mapList(taskBoard, TaskBoardDTO.class);
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
 
     }
 

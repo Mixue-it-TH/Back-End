@@ -86,13 +86,9 @@ public class BoardService {
         if(boardUserList.isEmpty()) {
             throw new ItemNotFoundException("Board id '" + boardId + "' not found");
         }
-        Claims claims = tokenUtil.decodedToken(request);
-
-        if(visibilityConfig.visibilityType(boardId) || permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
+//        Claims claims = tokenUtil.decodedToken(request);
             return listMapper.mapList(boardUserList, BoardDTO.class);
-        }else{
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
+
 
     }
 
@@ -102,8 +98,6 @@ public class BoardService {
             throw new ItemNotFoundException("Board id '" + boardId + "' not found");
         }
 
-        Claims claims = tokenUtil.decodedToken(request);
-        if(permission.getRoleOfBoard(boardId, claims.get("oid").toString())){
             try {
                 // แปลง String เป็น Enum ถ้าค่าไม่ถูกต้องจะเกิด IllegalArgumentException
                 Visibility visibility = Visibility.valueOf(visibilityDTO.getVisibility().toUpperCase());
@@ -116,8 +110,6 @@ public class BoardService {
                 // Handle ค่า visibility ที่ไม่ถูกต้อง และโยน BadRequestException (400)
                 throw new BadRequestException("Invalid visibility value: " + visibilityDTO.getVisibility());
             }
-        } else {
-            throw new ForBiddenException("You do not have permission to access this resource");
-        }
+
     }
 }
