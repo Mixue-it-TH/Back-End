@@ -60,7 +60,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String jwtToken = null;
 
 
-        if(request.getRequestURI().equals("/login") || request.getRequestURI().equals("/login/token")) { //handle ให้ login โดยไม่มี token ได้
+        if(request.getRequestURI().equals("/login") || request.getRequestURI().equals("/token")) { //handle ให้ login โดยไม่มี token ได้
             chain.doFilter(request, response);
             return;
         }
