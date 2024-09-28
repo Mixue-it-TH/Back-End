@@ -27,10 +27,5 @@ public class AuthContoller {
     public ResponseEntity<Token> Login(@Valid @RequestBody JwtRequestUser user) {
         return ResponseEntity.ok(service.login(user));
     }
-    @PostMapping("/token")
-    public ResponseEntity<Token> refreshTokenLogin( HttpServletRequest request) {
-         return ResponseEntity.ok(service.refreshLogin(request));
-    }
-
 
 }

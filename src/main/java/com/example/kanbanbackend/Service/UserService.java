@@ -73,7 +73,6 @@ public class UserService {
         String token = request.getHeader("Authorization").substring(7).trim();
         Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
         User user = repository.findUserByOid(claims.get("oid").toString());
-        System.out.println(user);
         if(user == null) throw new UnauthorizedException("Username or Password is incorrect");
 
         String tokenGenarate = jwtTokenUtil.generateToken(user);
