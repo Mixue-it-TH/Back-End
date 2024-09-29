@@ -56,6 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
 
+
         if (requestTokenHeader != null) {
             if (requestTokenHeader.startsWith("Bearer ")) {
                 jwtToken = requestTokenHeader.substring(7);
@@ -109,6 +110,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         } else if (requestTokenHeader == null) {
             String boardId = request.getRequestURI().split("/")[3];
+
             if (request.getMethod().equals("GET") && visibilityConfig.visibilityType(boardId)) {
                 chain.doFilter(request, response);
                 return;
