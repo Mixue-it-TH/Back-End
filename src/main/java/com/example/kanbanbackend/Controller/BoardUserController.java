@@ -123,7 +123,7 @@ public class BoardUserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> handleVisibility(@PathVariable String id, @RequestBody VisibilityDTO visibilityDTO, HttpServletRequest request){
+    public ResponseEntity<Object> handleVisibility(@PathVariable String id, @Valid @RequestBody VisibilityDTO visibilityDTO, HttpServletRequest request){
         return ResponseEntity.ok(boardService.setVisibility(id,visibilityDTO,request));
     }
 
