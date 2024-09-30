@@ -97,6 +97,10 @@ public class BoardService {
         if(board == null) {
             throw new ItemNotFoundException("Board id '" + boardId + "' not found");
         }
+        if(board.getVisibility().toString().equalsIgnoreCase(visibilityDTO.getVisibility())) {
+            throw new BadRequestException("Board id '" + boardId + "' is still " + " " +board.getVisibility().toString());
+        }
+
 
             try {
                 // แปลง String เป็น Enum ถ้าค่าไม่ถูกต้องจะเกิด IllegalArgumentException

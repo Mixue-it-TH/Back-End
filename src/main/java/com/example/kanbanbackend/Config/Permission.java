@@ -18,9 +18,7 @@ public class Permission {
     BoardUserRepository boardUserRepository;
     private static List<Integer> exceptStatus = new ArrayList<>(Arrays.asList(1,7));
 
-    public boolean canEditOrDelete(Integer id){
-        return !exceptStatus.contains(id);
-    }
+
 
     public boolean getRoleOfBoard(String boardId, String oid){
         BoardUser boardUser = boardUserRepository.findBoardUserByBoard_IdAndUser_Oid(boardId, oid);

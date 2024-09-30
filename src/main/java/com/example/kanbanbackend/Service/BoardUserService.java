@@ -14,16 +14,12 @@ import java.util.Optional;
 
 @Service
 public class BoardUserService {
-    @Autowired
-    ModelMapper mapper;
+
     @Autowired
     ListMapper listMapper;
     @Autowired
     private BoardUserRepository repository;
-    @Autowired
-    private StatusRepository statusRepository;
-    @Autowired
-    ConfigRepository configRepository;
+
 
 
 
