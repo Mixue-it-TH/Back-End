@@ -125,7 +125,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     chain.doFilter(request, response);
                     return;
                 } else if(!request.getMethod().equals("GET")){
-                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "You do have to login to do this service", request);
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "You have to login to do this service", request);
                     return;
                 }
                 else {

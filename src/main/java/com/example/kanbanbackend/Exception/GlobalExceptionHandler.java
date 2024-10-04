@@ -83,7 +83,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(Exception exception, HttpServletRequest request) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         if(request.getMethod().equalsIgnoreCase("PUT") || request.getMethod().equalsIgnoreCase("DELETE")){
-            ErrorResponse errorResponse = new ErrorResponse(timestamp,HttpStatus.NOT_FOUND.value(),HttpStatus.NOT_FOUND.name(), "Board id not found" , request.getRequestURI());
+            ErrorResponse errorResponse = new ErrorResponse(timestamp,HttpStatus.NOT_FOUND.value(),HttpStatus.NOT_FOUND.name(), "Board id or task id not found" , request.getRequestURI());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
 
