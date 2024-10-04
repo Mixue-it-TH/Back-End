@@ -56,7 +56,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
 
-
         if (requestTokenHeader != null) {
             if (requestTokenHeader.startsWith("Bearer ")) {
                 jwtToken = requestTokenHeader.substring(7);
@@ -84,7 +83,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                     Claims claims = jwtTokenUtil.decodedToken(request);
 
-                    //handle ให้ role owner เข้าใช้งานได้เลย
+
+
+
                     if (permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
                         chain.doFilter(request, response);
                         return;

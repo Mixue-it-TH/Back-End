@@ -66,6 +66,7 @@ public class BoardUserController {
 
     @PostMapping("/{id}/tasks")
     public ResponseEntity<Object> addTask(@PathVariable String id, @Valid @RequestBody TaskAddEditDTO newTaskDTO, HttpServletRequest request) {
+
         return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(id, newTaskDTO, request));
     }
 

@@ -82,8 +82,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(Exception exception, HttpServletRequest request) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        if(request.getMethod().equals("DELETE") || request.getMethod().equals("PUT")) {
+            ErrorResponse errorResponse = new ErrorResponse(timestamp,HttpStatus.NOT_FOUND.value(),HttpStatus.NOT_FOUND.name(), "Invalid request body", request.getRequestURI());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
         ErrorResponse errorResponse = new ErrorResponse(timestamp,HttpStatus.BAD_REQUEST.value(),HttpStatus.BAD_REQUEST.name(), "request body not found", request.getRequestURI());
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
