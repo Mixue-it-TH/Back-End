@@ -21,7 +21,7 @@ public class Board {
     @JoinColumn(name = "configId")
     private Config configId;
 
-    @Enumerated(EnumType.STRING)  // Store as a String in the DB
+    @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
     public Board(String id,String boardName, Config configId, Visibility visibility) {

@@ -1,37 +1,26 @@
 package com.example.kanbanbackend.Config;
 
-import com.example.kanbanbackend.Entitites.Primary.BoardUser;
-import com.example.kanbanbackend.Exception.BadRequestException;
-import com.example.kanbanbackend.Exception.ItemNotFoundException;
-import com.example.kanbanbackend.Repository.Primary.BoardUserRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import com.example.kanbanbackend.Entitites.Primary.Collaborator;
+import com.example.kanbanbackend.Repository.Primary.CollaboratorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 public class Permission {
     @Autowired
-    BoardUserRepository boardUserRepository;
-    private static List<Integer> exceptStatus = new ArrayList<>(Arrays.asList(1,7));
+    CollaboratorRepository boardUserRepository;
 
-    public boolean canEditOrDelete(Integer id){
-        return !exceptStatus.contains(id);
-    }
+    public boolean getPermissionOfBoard(String boardId, String oid, String request) {
+        Collaborator boardUser = boardUserRepository.findCollaboratorByBoard_IdAndUser_Oid(boardId, oid);
+        if (boardUser == null) return false;
+        if (boardUser.getRole().equalsIgnoreCase("owner")) return true;
 
-    public boolean getRoleOfBoard(String boardId, String oid){
-        BoardUser boardUser = boardUserRepository.findBoardUserByBoard_IdAndUser_Oid(boardId, oid);
-        if(boardUser == null){
-            return false;
-        }
-        if(boardUser.getRole().equalsIgnoreCase("owner")){
+        if (boardUser.getRole().equalsIgnoreCase("collab") && request.equalsIgnoreCase("DELETE")) return true;
+        if (boardUser.getRole().equalsIgnoreCase("collab") && boardUser.getAccess_right().equalsIgnoreCase("write")) {
             return true;
-        }else {
-            return false;
+        } else if (boardUser.getRole().equalsIgnoreCase("collab") && boardUser.getAccess_right().equalsIgnoreCase("read") && request.equalsIgnoreCase("GET")) {
+            return true;
         }
-
+        return false;
     }
 }

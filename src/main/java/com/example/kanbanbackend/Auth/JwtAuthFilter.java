@@ -3,6 +3,7 @@ package com.example.kanbanbackend.Auth;
 import com.example.kanbanbackend.Config.Permission;
 import com.example.kanbanbackend.Config.VisibilityConfig;
 import com.example.kanbanbackend.Exception.ErrorResponse;
+import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Service.JwtUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -82,29 +83,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (boardId != null) {
 
                     Claims claims = jwtTokenUtil.decodedToken(request);
-
-
-
-
-                    if (permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
+                    if (permission.getPermissionOfBoard(boardId, claims.get("oid").toString(),request.getMethod())) {
                         chain.doFilter(request, response);
                         return;
                     }
-
                     //handle getBoardLiast ของ user เพื่อไม่ไปทับลายกับ get method อื่นๆด้านล่าง
                     if (request.getRequestURI().contains("/v3/boards/user")) {
                         chain.doFilter(request, response);
                         return;
                     }
 
-                    //handle กรณีไม่ login เข้ามาและดู board public ได้เลย
-                    if (request.getMethod().equals("GET") && visibilityConfig.visibilityType(boardId)) {
-                        chain.doFilter(request, response);
-                        return;
-                    } else {
-                        sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this resource", request);
+                    try {
+                        if (visibilityConfig.visibilityType(boardId) && request.getMethod().equals("GET")) {
+                                chain.doFilter(request, response);
+                                return;
+                        }
+                        else {
+                            sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this resource", request);
+                            return;
+                        }
+                    } catch (ItemNotFoundException e) {
+                        // ส่ง 404 เมื่อ boardId ไม่เจอ
+                        sendErrorResponse(response, HttpStatus.NOT_FOUND, e.getMessage(), request);
                         return;
                     }
+
                 }
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "JWT Token does not begin with Bearer String");
@@ -112,11 +115,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         } else if (requestTokenHeader == null) {
             String boardId = request.getRequestURI().split("/")[3];
 
-            if (request.getMethod().equals("GET") && visibilityConfig.visibilityType(boardId)) {
-                chain.doFilter(request, response);
-                return;
-            } else {
-                sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this resource", request);
+            try {
+                //handle กรณีไม่ login เข้ามาและดู board public ได้เลย
+                if (request.getMethod().equals("GET") && visibilityConfig.visibilityType(boardId)) {
+                    chain.doFilter(request, response);
+                    return;
+                } else if(!request.getMethod().equals("GET")){
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "You have to login to do this service", request);
+                    return;
+                }
+                else {
+                    sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this resource", request);
+                    return;
+                }
+            } catch (ItemNotFoundException e) {
+                // ส่ง 404 เมื่อ boardId ไม่เจอ
+                sendErrorResponse(response, HttpStatus.NOT_FOUND, e.getMessage(), request);
                 return;
             }
         }
@@ -133,7 +147,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message, HttpServletRequest request) throws IOException {
         String timeStamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-//        ErrorValidationResponse errorValidationResponse = new ErrorValidationResponse(status.value(), message, null);
         ErrorResponse errorResponse = new ErrorResponse(timeStamp, status.value(), status.getReasonPhrase(), message, request.getRequestURI());
         response.setStatus(status.value());
         response.setContentType("application/json");

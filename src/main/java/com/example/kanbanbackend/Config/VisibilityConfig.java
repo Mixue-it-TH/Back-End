@@ -12,15 +12,6 @@ public class VisibilityConfig {
     @Autowired
     BoardRepository boardRepository;
 
-//    public boolean visibilityType(String boardId){
-//        Board board = boardRepository.findBoardById(boardId);
-//        if(board == null){
-//            throw new ItemNotFoundException("Board id '"+boardId+"' not found");
-//        }
-//        if(board.getVisibility() == 1){
-//            return true;
-//        }else return false;
-//    }
 
     public boolean visibilityType(String boardId){
         Board board = boardRepository.findBoardById(boardId);

@@ -6,6 +6,7 @@ import com.example.kanbanbackend.Auth.JwtRequestUser;
 import com.example.kanbanbackend.Entitites.AuthUser;
 import com.example.kanbanbackend.Entitites.Share.User;
 import com.example.kanbanbackend.Exception.UnauthorizedException;
+import com.example.kanbanbackend.Repository.Primary.PrimaryUserRepository;
 import com.example.kanbanbackend.Repository.Share.UserRepository;
 import com.example.kanbanbackend.Auth.JwtTokenUtil;
 import io.jsonwebtoken.Claims;
@@ -32,6 +33,8 @@ public class UserService {
     private PasswordService passwordService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private PrimaryUserRepository primaryUserRepository;
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -65,6 +68,12 @@ public class UserService {
 
         String tokenGenarate = jwtTokenUtil.generateToken(user);
         String refreshToken = jwtTokenUtil.generateRefreshToken(user);
+
+        com.example.kanbanbackend.Entitites.Primary.User primaryUser = primaryUserRepository.findUsersByOid(user.getOid());
+        if(primaryUser == null) {
+            primaryUser = new com.example.kanbanbackend.Entitites.Primary.User(user.getOid(), user.getUsername(), user.getEmail());
+            primaryUserRepository.save(primaryUser);
+        }
         return  new Token(tokenGenarate, refreshToken);
     }
 

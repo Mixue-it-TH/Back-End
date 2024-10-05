@@ -97,6 +97,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ConflictException exception, HttpServletRequest request) {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        ErrorResponse errorResponse = new ErrorResponse(timestamp,HttpStatus.CONFLICT.value(),HttpStatus.CONFLICT.name(), exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception exception, HttpServletRequest request) {

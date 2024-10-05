@@ -4,4 +4,6 @@ import com.example.kanbanbackend.Entitites.Primary.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PrimaryUserRepository extends JpaRepository<User,String> {
+
+    User findUsersByOid(String oid);
 }

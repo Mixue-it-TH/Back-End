@@ -49,8 +49,6 @@ public class TaskService {
     @Autowired
     private TaskRepository repository;
 
-    @Autowired
-    private ConfigRepository configRepository;
 
     @Autowired
     private StatusRepository statusRepository;
@@ -144,16 +142,19 @@ public class TaskService {
 
     @Transactional
     public TaskDTO updateTask(String boardId,Integer taskId, TaskAddEditDTO editedTask, HttpServletRequest request) {
+        Task oldTask = repository.findTaskByBoard_IdAndId(boardId, taskId);
+        if (oldTask == null) throw new ItemNotFoundException("Task id: " + taskId + " or boardId: "+ boardId +" doesn't exist !!!");
+
         if (editedTask.getTaskTitle() == null) throw new BadRequestWithFieldException("titie", "must not be null");
 
         limitService.CheckLimitTask(boardId,editedTask.getTaskStatusId());
+
 
         Status isExited = statusRepository.findStatusByBoard_IdAndId(boardId,editedTask.getTaskStatusId());
         if(isExited == null) throw new BadRequestWithFieldException("status", "Status id "+editedTask.getTaskStatusId()+"or Board id"+ boardId +" does not exist");
 
 
-        Task oldTask = repository.findTaskByBoard_IdAndId(boardId, taskId);
-        if (oldTask == null) throw new ItemNotFoundException("Task id: " + taskId + " or boardId: "+ boardId +" doesn't exist !!!");
+
 
         Claims claims = jwtTokenUtil.decodedToken(request);
 
