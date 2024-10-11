@@ -99,7 +99,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 return;
                         }
                         else {
-                            sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this resource", request);
+                            sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this reso:urce", request);
                             return;
                         }
                     } catch (ItemNotFoundException e) {

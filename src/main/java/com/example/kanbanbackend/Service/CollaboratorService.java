@@ -105,7 +105,8 @@ public class CollaboratorService {
         // CHECK userId that exist in DB 404
         com.example.kanbanbackend.Entitites.Primary.User userPrimary = primaryUserRepository.findUsersByOid(user.getOid());
         if (userPrimary == null) {
-            throw new ItemNotFoundException("User not found in Database");
+            userPrimary = new com.example.kanbanbackend.Entitites.Primary.User(user.getOid(), user.getUsername(), user.getEmail());
+            primaryUserRepository.save(userPrimary);
         }
 
         // CHECK boardId that exist in DB 404
