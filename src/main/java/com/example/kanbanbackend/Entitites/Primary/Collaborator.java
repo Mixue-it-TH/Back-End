@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
+@Table(name = "collaborator")
 public class Collaborator implements Serializable {
 
     @EmbeddedId
