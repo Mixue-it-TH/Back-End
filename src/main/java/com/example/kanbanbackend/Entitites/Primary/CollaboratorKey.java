@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Embeddable
 @Data
-public class BoardUserKey implements Serializable {
+public class CollaboratorKey implements Serializable {
 
     @Column(name = "userId")
     private String userId;

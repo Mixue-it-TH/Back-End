@@ -89,6 +89,7 @@ public class TaskService {
     public TaskSelectedDTO getTaskById(String boardId, int id, HttpServletRequest request) throws ItemNotFoundException {
 //        Task task =  repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Task "+ id +" does not exist !!!" ));
         Task task = repository.findTaskByBoard_IdAndId(boardId, id);
+        System.out.println(task);
         if (task == null) throw new ItemNotFoundException("Task id: " + id + " or boardId: "+ boardId +" doesn't exist !!!");
             // Assuming `getCreatedOn` and `getUpdatedOn` return `Timestamp`
             Timestamp createdOnTimestamp = task.getCreatedOn();

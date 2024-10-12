@@ -57,7 +57,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
 
-
         if (requestTokenHeader != null) {
             if (requestTokenHeader.startsWith("Bearer ")) {
                 jwtToken = requestTokenHeader.substring(7);
@@ -84,13 +83,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (boardId != null) {
 
                     Claims claims = jwtTokenUtil.decodedToken(request);
-
-                    //handle ให้ role owner เข้าใช้งานได้เลย
-                    if (permission.getRoleOfBoard(boardId, claims.get("oid").toString())) {
+                    if (permission.getPermissionOfBoard(boardId, claims.get("oid").toString(),request.getMethod())) {
                         chain.doFilter(request, response);
                         return;
                     }
-
                     //handle getBoardLiast ของ user เพื่อไม่ไปทับลายกับ get method อื่นๆด้านล่าง
                     if (request.getRequestURI().contains("/v3/boards/user")) {
                         chain.doFilter(request, response);
@@ -103,7 +99,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 return;
                         }
                         else {
-                            sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this resource", request);
+                            sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this reso:urce", request);
                             return;
                         }
                     } catch (ItemNotFoundException e) {
@@ -125,7 +121,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     chain.doFilter(request, response);
                     return;
                 } else if(!request.getMethod().equals("GET")){
-                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "You do have to login to do this service", request);
+                    sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "You have to login to do this service", request);
                     return;
                 }
                 else {
@@ -151,7 +147,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message, HttpServletRequest request) throws IOException {
         String timeStamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-//        ErrorValidationResponse errorValidationResponse = new ErrorValidationResponse(status.value(), message, null);
         ErrorResponse errorResponse = new ErrorResponse(timeStamp, status.value(), status.getReasonPhrase(), message, request.getRequestURI());
         response.setStatus(status.value());
         response.setContentType("application/json");
