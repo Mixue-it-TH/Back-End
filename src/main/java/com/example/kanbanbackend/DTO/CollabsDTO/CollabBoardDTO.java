@@ -20,7 +20,9 @@ public class CollabBoardDTO {
     @JsonProperty("collab")
     private OwnerDTO user;
 
+    @JsonProperty("owner")
     private String ownerName;
+    @JsonProperty("accessRight")
     private String access_right;
 
 

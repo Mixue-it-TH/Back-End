@@ -1,10 +1,7 @@
 package com.example.kanbanbackend.Service;
 
 import com.example.kanbanbackend.Auth.JwtTokenUtil;
-import com.example.kanbanbackend.DTO.CollabsDTO.CollabBoardDTO;
-import com.example.kanbanbackend.DTO.CollabsDTO.CollabDTO;
-import com.example.kanbanbackend.DTO.CollabsDTO.CollabRequestDTO;
-import com.example.kanbanbackend.DTO.CollabsDTO.EmailDTO;
+import com.example.kanbanbackend.DTO.CollabsDTO.*;
 import com.example.kanbanbackend.DTO.PersonalBoardDTO;
 import com.example.kanbanbackend.Entitites.Primary.Board;
 import com.example.kanbanbackend.Entitites.Primary.Collaborator;
@@ -84,7 +81,7 @@ public class CollaboratorService {
         return collabDTO;
     }
 
-    public Collaborator addCollab(String boardId, CollabRequestDTO collab, HttpServletRequest request) {
+    public CollaboratorResponseDTO addCollab(String boardId, CollabRequestDTO collab, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7).trim();
         Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
 
@@ -133,10 +130,18 @@ public class CollaboratorService {
         // CREATE COLAB
         String username = claims.get("name").toString();
         Collaborator newCollab = new Collaborator(userPrimary, board, "COLLAB", collab.getAccess_right(), username);
-        return repository.saveAndFlush(newCollab);
+        Collaborator savedCollab = repository.saveAndFlush(newCollab);
+
+        return new CollaboratorResponseDTO(
+                savedCollab.getId().getUserId(),
+                savedCollab.getBoard().getId(),
+                savedCollab.getUser().getUserName(),
+                savedCollab.getUser().getEmail(),
+                savedCollab.getAccess_right()
+        );
     }
 
-    public Collaborator updateCollab(String boardId, String collabId, CollabRequestDTO collab, HttpServletRequest request) {
+    public Map<String, String>  updateCollab(String boardId, String collabId, AccessDTO access, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7).trim();
         Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
 
@@ -149,7 +154,7 @@ public class CollaboratorService {
 
         // CHECK collab_oid is in board 404
         Collaborator oldCollaborator = repository.findCollaboratorByBoard_IdAndUser_Oid(boardId, collabId);
-        if (oldCollaborator == null) {
+        if (oldCollaborator == null || oldCollaborator.getRole().equalsIgnoreCase("OWNER")) {
             throw new ItemNotFoundException("collabId: " + collabId + " collaborator not found");
         }
 
@@ -157,8 +162,14 @@ public class CollaboratorService {
         Board board = boardRepository.findBoardById(boardId);
 
         // CREATE COLAB
-        oldCollaborator.setAccess_right(collab.getAccess_right());
-        return repository.saveAndFlush(oldCollaborator);
+        oldCollaborator.setAccess_right(access.getAccess_right());
+        repository.saveAndFlush(oldCollaborator);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("accessRight", oldCollaborator.getAccess_right());
+
+        return result;
+
     }
 
     public Collaborator deleteCollab(String boardId, String collabId, HttpServletRequest request) {
@@ -173,7 +184,7 @@ public class CollaboratorService {
         if (!oid.equalsIgnoreCase(collabId) && owner == null)
             throw new ForBiddenException("You don't have permission to delete other collaborator.");
         // CASE owner try to delete yourself
-        if (oid.equalsIgnoreCase(collabId) && owner != null) throw new ForBiddenException("You can't delete owner.");
+        if (oid.equalsIgnoreCase(collabId) && owner != null) throw new ItemNotFoundException("Id "+ collabId + " is not found of board");
 
         // CHECK collab_oid is in board 404
         Collaborator oldCollaborator = repository.findCollaboratorByBoard_IdAndUser_Oid(boardId, collabId);
