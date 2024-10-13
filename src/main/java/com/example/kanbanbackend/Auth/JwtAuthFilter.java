@@ -83,7 +83,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (boardId != null) {
 
                     Claims claims = jwtTokenUtil.decodedToken(request);
-                    if (permission.getPermissionOfBoard(boardId, claims.get("oid").toString(),request.getMethod())) {
+                    if (permission.getPermissionOfBoard(boardId, claims.get("oid").toString(),request.getMethod(),request.getRequestURI())){
                         chain.doFilter(request, response);
                         return;
                     }
@@ -99,7 +99,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 return;
                         }
                         else {
-                            sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this reso:urce", request);
+                            sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this resource", request);
                             return;
                         }
                     } catch (ItemNotFoundException e) {

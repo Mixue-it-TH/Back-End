@@ -1,6 +1,7 @@
 package com.example.kanbanbackend.Entitites.Primary;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -29,6 +30,7 @@ public class Collaborator implements Serializable {
     private String role;
 
     @Column(name = "accessRight", nullable = false)
+    @JsonProperty("accessRight")
     private String access_right;
 
     @Column(name = "addedOn", nullable = false, insertable = false, updatable = false)

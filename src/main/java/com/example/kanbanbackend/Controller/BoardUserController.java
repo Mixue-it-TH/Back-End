@@ -1,5 +1,6 @@
 package com.example.kanbanbackend.Controller;
 
+import com.example.kanbanbackend.DTO.CollabsDTO.AccessDTO;
 import com.example.kanbanbackend.DTO.PersonalBoardDTO;
 import com.example.kanbanbackend.DTO.CollabsDTO.CollabRequestDTO;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
@@ -146,8 +147,8 @@ public class BoardUserController {
     }
 
     @PatchMapping("/{id}/collabs/{collabId}")
-    public ResponseEntity<Object> updateCollab(@PathVariable String id, @PathVariable String collabId, @Valid @RequestBody CollabRequestDTO collab,HttpServletRequest request) {
-        return ResponseEntity.ok(collaboratorService.updateCollab(id, collabId, collab,request));
+    public ResponseEntity<Object> updateCollab(@PathVariable String id, @PathVariable String collabId, @Valid @RequestBody AccessDTO access, HttpServletRequest request) {
+        return ResponseEntity.ok(collaboratorService.updateCollab(id, collabId, access,request));
     }
 
     @DeleteMapping("/{id}/collabs/{collabId}")

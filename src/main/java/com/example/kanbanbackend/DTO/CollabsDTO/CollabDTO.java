@@ -12,6 +12,7 @@ public class CollabDTO {
     @JsonProperty("name")
     private String userName;
     private String email;
+    @JsonProperty("accessRight")
     private String access_right;
     @Column(name = "added_On", nullable = false, insertable = false, updatable = false)
     private Timestamp addedOn;

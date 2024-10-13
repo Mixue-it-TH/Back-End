@@ -201,9 +201,6 @@ public class TaskService {
     public List<TaskBoardDTO>getTaskofBoard(String boardId, HttpServletRequest request) {
 
             List<Task> taskBoard = repository.findTaskByBoard_Id(boardId);
-            if (taskBoard.isEmpty()) {
-                throw new BadRequestException("This board has no task !!");
-            }
             return listMapper.mapList(taskBoard, TaskBoardDTO.class);
 
     }
