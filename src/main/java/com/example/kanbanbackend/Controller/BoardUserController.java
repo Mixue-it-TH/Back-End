@@ -1,8 +1,8 @@
 package com.example.kanbanbackend.Controller;
 
 import com.example.kanbanbackend.DTO.CollabsDTO.AccessDTO;
-import com.example.kanbanbackend.DTO.PersonalBoardDTO;
 import com.example.kanbanbackend.DTO.CollabsDTO.CollabRequestDTO;
+import com.example.kanbanbackend.DTO.PersonalBoardDTO;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.VisibilityDTO;
@@ -33,10 +33,17 @@ public class BoardUserController {
     @Autowired
     private StatusService statusService;
 
+    //    @GetMapping("")
+//    public ResponseEntity<Object> getAllBoardUser() {
+//        return ResponseEntity.ok(collaboratorService.getAllCollaborator());
+//    }
+
+    // new version for PBI 24 ++
     @GetMapping("")
-    public ResponseEntity<Object> getAllBoardUser() {
-        return ResponseEntity.ok(collaboratorService.getAllCollaborator());
+    public ResponseEntity<Object> getBoardUserByUserOID2(HttpServletRequest request) {
+        return ResponseEntity.ok(collaboratorService.getPersonalAndColloboratorByToken(request));
     }
+
 
     @GetMapping("/user/{oid}")
     public ResponseEntity<Object> getBoardUserByUserOID(@PathVariable String oid) {
@@ -142,18 +149,18 @@ public class BoardUserController {
     }
 
     @PostMapping("/{id}/collabs")
-    public ResponseEntity<Object> addCollab(@PathVariable String id, @Valid @RequestBody CollabRequestDTO callab,HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(collaboratorService.addCollab(id,callab,request));
+    public ResponseEntity<Object> addCollab(@PathVariable String id, @Valid @RequestBody CollabRequestDTO callab, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(collaboratorService.addCollab(id, callab, request));
     }
 
     @PatchMapping("/{id}/collabs/{collabId}")
     public ResponseEntity<Object> updateCollab(@PathVariable String id, @PathVariable String collabId, @Valid @RequestBody AccessDTO access, HttpServletRequest request) {
-        return ResponseEntity.ok(collaboratorService.updateCollab(id, collabId, access,request));
+        return ResponseEntity.ok(collaboratorService.updateCollab(id, collabId, access, request));
     }
 
     @DeleteMapping("/{id}/collabs/{collabId}")
     public ResponseEntity<Object> deleteCollab(@PathVariable String id, @PathVariable String collabId, HttpServletRequest request) {
-        return ResponseEntity.ok(collaboratorService.deleteCollab(id, collabId,request));
+        return ResponseEntity.ok(collaboratorService.deleteCollab(id, collabId, request));
     }
 
 
