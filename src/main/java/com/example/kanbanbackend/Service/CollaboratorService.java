@@ -52,6 +52,24 @@ public class CollaboratorService {
         return repository.findAll();
     }
 
+    public Map<String, Object> getPersonalAndColloboratorByToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7).trim();
+        Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
+        String oid = (String) claims.get("oid");
+
+        List<Collaborator> boardOwnerList = repository.findCollaboratorByUser_OidAndRole(oid, "OWNER");
+        List<PersonalBoardDTO> personalBoardDTOs = listMapper.mapList(boardOwnerList, PersonalBoardDTO.class);
+
+        List<Collaborator> boardCollabList = repository.findCollaboratorByUser_OidAndRole(oid, "COLLAB");
+        List<CollabBoardDTO> collabBoardDTOs = listMapper.mapList(boardCollabList, CollabBoardDTO.class);
+
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("owners", personalBoardDTOs);
+        result.put("collabs", collabBoardDTOs);
+
+        return result;
+    }
     public Map<String, Object> getPersonalAndColloboratorByUser_Oid(String oid) {
         List<Collaborator> boardOwnerList = repository.findCollaboratorByUser_OidAndRole(oid, "OWNER");
         List<PersonalBoardDTO> personalBoardDTOs = listMapper.mapList(boardOwnerList, PersonalBoardDTO.class);
