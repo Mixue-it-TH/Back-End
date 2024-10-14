@@ -7,6 +7,9 @@ import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.VisibilityDTO;
 import com.example.kanbanbackend.Entitites.Primary.Config;
+import com.example.kanbanbackend.Entitites.Primary.Task;
+import com.example.kanbanbackend.Exception.ItemNotFoundException;
+import com.example.kanbanbackend.Repository.Primary.TaskRepository;
 import com.example.kanbanbackend.Service.BoardService;
 import com.example.kanbanbackend.Service.CollaboratorService;
 import com.example.kanbanbackend.Service.StatusService;
@@ -16,7 +19,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = {"http://ip23sy2.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th", "https://ip23sy2.sit.kmutt.ac.th", "https://intproj23.sit.kmutt.ac.th", "http://localhost:5173"})
@@ -32,6 +39,9 @@ public class BoardUserController {
 
     @Autowired
     private StatusService statusService;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     //    @GetMapping("")
 //    public ResponseEntity<Object> getAllBoardUser() {
@@ -79,7 +89,7 @@ public class BoardUserController {
     }
 
     @PutMapping("/{id}/tasks/{taskId}")
-    public ResponseEntity<Object> updateTaskByBoardId(@PathVariable String id, @PathVariable Integer taskId, @Valid @RequestBody TaskAddEditDTO editedTask, HttpServletRequest request) {
+    public ResponseEntity<Object> updateTaskByBoardId(@PathVariable String id, @PathVariable Integer taskId, @Valid @RequestBody TaskAddEditDTO editedTask, BindingResult bindingResult, HttpServletRequest request) {
         return ResponseEntity.ok(taskService.updateTask(id, taskId, editedTask, request));
     }
 
