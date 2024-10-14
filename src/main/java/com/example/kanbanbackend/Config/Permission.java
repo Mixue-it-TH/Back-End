@@ -18,10 +18,12 @@ public class Permission {
         // If the user is the owner of the board, return true
         if (boardUser.getRole().equalsIgnoreCase("owner")) return true;
 
-        // If the user is a collaborator of the board, check the access rights
-        if (boardUser.getRole().equalsIgnoreCase("collab") && request.equalsIgnoreCase("DELETE")) return true;
-
         String regex = "^/v3/boards/([a-zA-Z0-9_-]{10})/collabs$";
+        
+
+        // If the user is a collaborator of the board, check the access rights
+        if (boardUser.getRole().equalsIgnoreCase("collab") && request.equalsIgnoreCase("DELETE") && requestURI.matches(regex)) return true;
+
         // If the user is a collaborator of the board and has write access, return true
         if (boardUser.getRole().equalsIgnoreCase("collab") && boardUser.getAccess_right().equalsIgnoreCase("write") ) {
             System.out.println("EREWRW");

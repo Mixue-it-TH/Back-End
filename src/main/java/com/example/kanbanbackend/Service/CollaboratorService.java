@@ -180,7 +180,7 @@ public class CollaboratorService {
         Board board = boardRepository.findBoardById(boardId);
 
         // CREATE COLAB
-        oldCollaborator.setAccess_right(access.getAccess_right());
+        oldCollaborator.setAccess_right(access.getAccessRight());
         repository.saveAndFlush(oldCollaborator);
 
         Map<String, String> result = new HashMap<>();

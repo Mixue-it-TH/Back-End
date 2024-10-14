@@ -10,5 +10,5 @@ public class AccessDTO {
     @Pattern(regexp = "WRITE|READ", message = "Access right must be either 'WRITE' or 'READ'.")
     @NotNull(message = "Access right must not be null.")
     @Value("${default.access.right:READ}")
-    private String access_right;
+    private String accessRight;
 }
