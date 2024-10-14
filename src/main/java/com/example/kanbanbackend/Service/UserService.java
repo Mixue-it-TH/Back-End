@@ -71,7 +71,7 @@ public class UserService {
 
         com.example.kanbanbackend.Entitites.Primary.User primaryUser = primaryUserRepository.findUsersByOid(user.getOid());
         if(primaryUser == null) {
-            primaryUser = new com.example.kanbanbackend.Entitites.Primary.User(user.getOid(), user.getUsername(), user.getEmail());
+            primaryUser = new com.example.kanbanbackend.Entitites.Primary.User(user.getOid(), user.getName(), user.getEmail());
             primaryUserRepository.save(primaryUser);
         }
         return  new Token(tokenGenarate, refreshToken);
