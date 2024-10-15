@@ -120,7 +120,7 @@ public class CollaboratorService {
         // CHECK userId that exist in DB 404
         com.example.kanbanbackend.Entitites.Primary.User userPrimary = primaryUserRepository.findUsersByOid(user.getOid());
         if (userPrimary == null) {
-            userPrimary = new com.example.kanbanbackend.Entitites.Primary.User(user.getOid(), user.getUsername(), user.getEmail());
+            userPrimary = new com.example.kanbanbackend.Entitites.Primary.User(user.getOid(), user.getName(), user.getEmail());
             primaryUserRepository.save(userPrimary);
         }
 

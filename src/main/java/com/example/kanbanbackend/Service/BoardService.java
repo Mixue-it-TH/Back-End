@@ -10,6 +10,8 @@ import com.example.kanbanbackend.Entitites.Primary.*;
 import com.example.kanbanbackend.Exception.BadRequestException;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Repository.Primary.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.viascom.nanoid.NanoId;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BoardService {
@@ -61,7 +65,7 @@ public class BoardService {
         String email = claims.get("email", String.class);
         String name = claims.get("name", String.class);
         String role = "OWNER";
-        User user = primaryUserRepository.saveAndFlush(new User(oid, claims.getSubject(), email));
+        User user = primaryUserRepository.saveAndFlush(new User(oid, name, email));
 
 
         Board newBoard = boardRepository.saveAndFlush(new Board(NanoId.generate(10), boardDTO.getBoardName(), config, Visibility.PRIVATE));
@@ -115,7 +119,7 @@ public class BoardService {
 
     }
 
-    public List<CollabDTO> getAllCollabsByBoardId(String boardId) {
+    public Map<String, Object> getAllCollabsByBoardId(String boardId) {
         List<Collaborator> collaborators = boardUserRepository.findCollaboratorByBoard_IdAndRole(boardId, "COLLAB");
 
         // CHECK 404
@@ -132,6 +136,9 @@ public class BoardService {
             collabDTO.setAddedOn(collaborator.getAddedOn());
             collabDTOList.add(collabDTO);
         }
-        return collabDTOList;
+        Map<String, Object> response = new HashMap<>();
+        response.put("collaborators", collabDTOList);
+
+        return response;
     }
 }
