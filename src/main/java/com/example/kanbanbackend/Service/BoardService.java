@@ -88,12 +88,12 @@ public class BoardService {
         return mapper.map(boardUser, PersonalBoardDTO.class);
     }
 
-    public List<PersonalBoardDTO> getBoardUserByBoardId(String boardId, HttpServletRequest request) {
+    public PersonalBoardDTO getBoardUserByBoardId(String boardId, HttpServletRequest request) {
         List<Collaborator> boardUserList = boardUserRepository.findCollaboratorByBoard_IdAndRole(boardId, "OWNER");
         if (boardUserList.isEmpty()) {
             throw new ItemNotFoundException("Board id '" + boardId + "' not found");
         }
-        return listMapper.mapList(boardUserList, PersonalBoardDTO.class);
+        return mapper.map(boardUserList.get(0), PersonalBoardDTO.class);
 
 
     }
