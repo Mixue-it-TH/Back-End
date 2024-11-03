@@ -10,10 +10,7 @@ import com.example.kanbanbackend.Entitites.Primary.Config;
 import com.example.kanbanbackend.Entitites.Primary.Task;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Repository.Primary.TaskRepository;
-import com.example.kanbanbackend.Service.BoardService;
-import com.example.kanbanbackend.Service.CollaboratorService;
-import com.example.kanbanbackend.Service.StatusService;
-import com.example.kanbanbackend.Service.TaskService;
+import com.example.kanbanbackend.Service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +33,9 @@ public class BoardUserController {
     private BoardService boardService;
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private InvitationService invitationService;
 
     @Autowired
     private StatusService statusService;
@@ -159,8 +159,8 @@ public class BoardUserController {
     }
 
     @PostMapping("/{id}/collabs")
-    public ResponseEntity<Object> addCollab(@PathVariable String id, @Valid @RequestBody CollabRequestDTO callab, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(collaboratorService.addCollab(id, callab, request));
+    public ResponseEntity<Object> addCollab(@PathVariable String id, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(collaboratorService.addCollab(id, request));
     }
 
     @PatchMapping("/{id}/collabs/{collabId}")
@@ -172,6 +172,28 @@ public class BoardUserController {
     public ResponseEntity<Object> deleteCollab(@PathVariable String id, @PathVariable String collabId, HttpServletRequest request) {
         return ResponseEntity.ok(collaboratorService.deleteCollab(id, collabId, request));
     }
+
+    // SPRINT 5 ENDPOINTS
+    @GetMapping("/{id}/collabs/invitations")
+    public ResponseEntity<Object> getInvitationsByBoardId(@PathVariable String id,HttpServletRequest request) {
+        return ResponseEntity.ok(invitationService.getInvitationsByBoardId(id,request));
+    }
+
+    @PostMapping("/{id}/collabs/invitations")
+    public ResponseEntity<Object> acceptInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(id,collab, request));
+    }
+
+    @PatchMapping("/{id}/collabs/invitations/{oid}")
+    public ResponseEntity<Object> updateInvitation(@PathVariable String id,@PathVariable String oid,@Valid @RequestBody AccessDTO access, HttpServletRequest request) {
+        return ResponseEntity.ok(invitationService.updateInvitation(id,oid, access, request));
+    }
+
+    @DeleteMapping("/{id}/collabs/invitations/{oid}")
+    public ResponseEntity<Object> declineInvitation(@PathVariable String id,@PathVariable String oid, HttpServletRequest request) {
+       return ResponseEntity.ok(invitationService.declineInvitation(id,oid,request));
+    }
+
 
 
 }

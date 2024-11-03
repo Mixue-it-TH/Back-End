@@ -4,14 +4,13 @@ import com.example.kanbanbackend.Auth.JwtTokenUtil;
 import com.example.kanbanbackend.Config.Permission;
 import com.example.kanbanbackend.Config.VisibilityConfig;
 import com.example.kanbanbackend.DTO.CollabsDTO.CollabDTO;
+import com.example.kanbanbackend.DTO.InvitationDTO.InvitationDTO;
 import com.example.kanbanbackend.DTO.PersonalBoardDTO;
 import com.example.kanbanbackend.DTO.VisibilityDTO;
 import com.example.kanbanbackend.Entitites.Primary.*;
 import com.example.kanbanbackend.Exception.BadRequestException;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Repository.Primary.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.viascom.nanoid.NanoId;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +43,8 @@ public class BoardService {
     private DefaultStatusRepository defaultStatusRepository;
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private InvitationRepository invitationRepository;
 
     @Autowired
     private JwtTokenUtil tokenUtil;
@@ -136,8 +137,23 @@ public class BoardService {
             collabDTO.setAddedOn(collaborator.getAddedOn());
             collabDTOList.add(collabDTO);
         }
+
+        List<Invitation> invitations = invitationRepository.findInvitationByBoard_Id(boardId);
+        List<InvitationDTO> invitationDTOS = new ArrayList<>();
+        for (Invitation invitation : invitations) {
+            InvitationDTO invitationDTO = new InvitationDTO();
+            invitationDTO.setOid(invitation.getUser().getOid());
+            invitationDTO.setUserName(invitation.getUser().getUserName());
+            invitationDTO.setEmail(invitation.getUser().getEmail());
+            invitationDTO.setAccess_right(invitation.getAccess_right());
+            invitationDTO.setStatus(invitation.getStatus());
+            invitationDTOS.add(invitationDTO);
+
+        }
+
         Map<String, Object> response = new HashMap<>();
         response.put("collaborators", collabDTOList);
+        response.put("invitations", invitationDTOS);
 
         return response;
     }

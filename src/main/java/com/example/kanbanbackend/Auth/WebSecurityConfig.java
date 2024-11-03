@@ -34,6 +34,7 @@ public class WebSecurityConfig {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(
                         authorize -> authorize.requestMatchers("/login/**", "/v3/boards/**","/token").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults());

@@ -16,6 +16,7 @@ public interface CollaboratorRepository extends JpaRepository<Collaborator, Coll
 
 
 
+
     List<Collaborator> findCollabaratorByBoard_Id(String boardId);
 
     Collaborator findCollaboratorByBoard_IdAndUser_Oid(String boardId, String userId);

@@ -50,11 +50,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
+        if (request.getRequestURI().startsWith("/swagger-ui") || request.getRequestURI().startsWith("/v3/api-docs")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
 
         if (request.getRequestURI().equals("/login")) { //handle ให้ login โดยไม่มี token ได้
             chain.doFilter(request, response);
             return;
         }
+
 
 
         if (requestTokenHeader != null) {
@@ -87,8 +93,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         chain.doFilter(request, response);
                         return;
                     }
+
+
+
                     //handle getBoardLiast ของ user เพื่อไม่ไปทับลายกับ get method อื่นๆด้านล่าง
                     if (request.getRequestURI().contains("/v3/boards/user")) {
+                        chain.doFilter(request, response);
+                        return;
+                    }
+
+                    // HANDLE เขียนเพิ่มให้หน่อย ถ้าหาก method เป็น GET และเป็น path ของ /boards/xxxxx/collabs ให้ผ่านไปเลย
+                    if(request.getRequestURI().contains("collabs")){
+                        chain.doFilter(request, response);
+                        return;
+                    }
+
+                    // Invitations กันเพิ่มให้หน่อย เอาคล้ายๆ permission ของ collabs มาใช้
+                    if(request.getRequestURI().contains("invitations")){
                         chain.doFilter(request, response);
                         return;
                     }
