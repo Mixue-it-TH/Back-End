@@ -3,10 +3,10 @@ package com.example.kanbanbackend.Service;
 
 import com.example.kanbanbackend.DTO.CollabsDTO.AccessDTO;
 import com.example.kanbanbackend.DTO.CollabsDTO.CollabRequestDTO;
-import com.example.kanbanbackend.DTO.CollabsDTO.CollaboratorResponseDTO;
 import com.example.kanbanbackend.DTO.CollabsDTO.EmailDTO;
 import com.example.kanbanbackend.DTO.InvitationDTO.InvitationResDTO;
 import com.example.kanbanbackend.DTO.InvitationDTO.InvitationResponseDTO;
+import com.example.kanbanbackend.Email.EmailService;
 import com.example.kanbanbackend.Entitites.Primary.Board;
 import com.example.kanbanbackend.Entitites.Primary.Collaborator;
 import com.example.kanbanbackend.Entitites.Primary.Invitation;
@@ -50,6 +50,9 @@ public class InvitationService {
     private UserRepository userRepository;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private ClaimsUtil claimsUtil;
 
     public InvitationResDTO getInvitationsByBoardId(String boardId, HttpServletRequest request) {
@@ -72,7 +75,8 @@ public class InvitationService {
         return invitationResDTO;
     }
 
-    public InvitationResponseDTO createInvitation(String boardId, CollabRequestDTO collabRequestDTO, HttpServletRequest request) {
+    public InvitationResponseDTO createInvitation(String boardId, CollabRequestDTO collabRequestDTO, HttpServletRequest request,String origin) {
+        System.out.println(origin);
         Claims claims = claimsUtil.getClaims(request);
         String oid = (String) claims.get("oid");
 
@@ -91,7 +95,7 @@ public class InvitationService {
 //
 //        // CHECK THAT BOARD NOT EXIST 404
         Board board = boardRepository.findBoardById(boardId);
-        if(board == null){
+        if (board == null) {
             throw new ItemNotFoundException("Board id: " + boardId + " not found");
         }
 //
@@ -116,14 +120,24 @@ public class InvitationService {
         boolean emailExists = emailDTOS.stream()
                 .anyMatch(emailDTO -> emailDTO.getEmail().equals(collabRequestDTO.getEmail()));
 
+        Invitation invitation = invitationRepository.findInvitationByBoard_IdAndUser_Oid(boardId, user.getOid());
+
+        if (invitation != null) {
+            throw new ConflictException("There are some conflicts with the email.");
+        }
+
         if (emailExists) {
             throw new ConflictException("There are some conflicts with the email.");
         }
 
         // CREATE COLAB
         String username = claims.get("name").toString();
-        Invitation newCollab = new Invitation(collabRequestDTO.getAccess_right(),"PENDING",username,userPrimary, board);
+        Invitation newCollab = new Invitation(collabRequestDTO.getAccess_right(), "PENDING", username, userPrimary, board);
         Invitation savedCollab = invitationRepository.saveAndFlush(newCollab);
+
+        String url = origin+"/board/"+ boardId + "/collab/invitations";
+
+        emailService.sendInvitationEmail("golfpopmei14@gmail.com", username, board.getBoardName(), collabRequestDTO.getAccess_right(),url);
 
         return new InvitationResponseDTO(
                 savedCollab.getUser().getOid(),
@@ -149,12 +163,11 @@ public class InvitationService {
         }
 
 
-
         invitationRepository.delete(invitation);
         return invitation;
     }
 
-    public Map<String, String> updateInvitation(String boardId,String Useroid, AccessDTO accessRight, HttpServletRequest request) {
+    public Map<String, String> updateInvitation(String boardId, String Useroid, AccessDTO accessRight, HttpServletRequest request) {
 
         Claims claims = claimsUtil.getClaims(request);
         String oid = (String) claims.get("oid");

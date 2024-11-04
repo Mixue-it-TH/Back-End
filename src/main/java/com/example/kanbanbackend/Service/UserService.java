@@ -4,6 +4,7 @@ package com.example.kanbanbackend.Service;
 import com.example.kanbanbackend.Auth.JwtRequestUser;
 import com.example.kanbanbackend.Auth.JwtTokenUtil;
 import com.example.kanbanbackend.DTO.Token;
+import com.example.kanbanbackend.Email.EmailService;
 import com.example.kanbanbackend.Entitites.AuthUser;
 import com.example.kanbanbackend.Entitites.Share.User;
 import com.example.kanbanbackend.Exception.UnauthorizedException;
@@ -36,19 +37,12 @@ public class UserService {
     @Autowired
     private PrimaryUserRepository primaryUserRepository;
 
+
     public List<User> getAllUser() {
         List<User> users = repository.findAll();
         return users;
     }
 
-    @Transactional
-    public User createUser(User userData) {
-        String enconder = passwordService.hashPassword(userData.getPassword());
-        userData.setPassword(enconder);
-        User user = repository.saveAndFlush(userData);
-        return user;
-
-    }
 
     public Token login(JwtRequestUser userData) {
         // check is user is exist on the DB
@@ -70,6 +64,7 @@ public class UserService {
             primaryUser = new com.example.kanbanbackend.Entitites.Primary.User(user.getOid(), user.getName(), user.getEmail());
             primaryUserRepository.save(primaryUser);
         }
+
         return new Token(tokenGenarate, refreshToken);
     }
 

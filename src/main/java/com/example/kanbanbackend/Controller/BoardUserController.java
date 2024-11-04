@@ -180,8 +180,8 @@ public class BoardUserController {
     }
 
     @PostMapping("/{id}/collabs/invitations")
-    public ResponseEntity<Object> acceptInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(id,collab, request));
+    public ResponseEntity<Object> acceptInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request, @RequestHeader(value = "Origin", required = false) String origin) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(id,collab, request,origin));
     }
 
     @PatchMapping("/{id}/collabs/invitations/{oid}")

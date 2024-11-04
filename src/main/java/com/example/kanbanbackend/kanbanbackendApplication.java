@@ -1,7 +1,10 @@
 package com.example.kanbanbackend;
 
+import com.example.kanbanbackend.Email.EmailService;
+import jakarta.activation.DataHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
@@ -23,6 +26,7 @@ public class kanbanbackendApplication {
         // Convert timestamp back to ZonedDateTime for verification
         ZonedDateTime convertedBack = Timestamp.from(now.toInstant()).toInstant().atZone(ZoneOffset.UTC);
         System.out.println("Converted back: " + convertedBack);
+
     }
 
 }
