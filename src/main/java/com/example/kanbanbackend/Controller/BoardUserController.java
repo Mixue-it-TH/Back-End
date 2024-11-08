@@ -2,13 +2,14 @@ package com.example.kanbanbackend.Controller;
 
 import com.example.kanbanbackend.DTO.CollabsDTO.AccessDTO;
 import com.example.kanbanbackend.DTO.CollabsDTO.CollabRequestDTO;
+import com.example.kanbanbackend.DTO.FilesDTO.FileAddEditDTO;
+import com.example.kanbanbackend.DTO.FilesDTO.FileDTO;
 import com.example.kanbanbackend.DTO.PersonalBoardDTO;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.VisibilityDTO;
 import com.example.kanbanbackend.Entitites.Primary.Config;
-import com.example.kanbanbackend.Entitites.Primary.Task;
-import com.example.kanbanbackend.Exception.ItemNotFoundException;
+import com.example.kanbanbackend.Entitites.Primary.File;
 import com.example.kanbanbackend.Repository.Primary.TaskRepository;
 import com.example.kanbanbackend.Service.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +21,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = {"http://ip23sy2.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th", "https://ip23sy2.sit.kmutt.ac.th", "https://intproj23.sit.kmutt.ac.th", "http://localhost:5173"})
@@ -42,6 +42,9 @@ public class BoardUserController {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    FileService fileService;
 
     //    @GetMapping("")
 //    public ResponseEntity<Object> getAllBoardUser() {
@@ -89,8 +92,8 @@ public class BoardUserController {
     }
 
     @PutMapping("/{id}/tasks/{taskId}")
-    public ResponseEntity<Object> updateTaskByBoardId(@PathVariable String id, @PathVariable Integer taskId, @Valid @RequestBody TaskAddEditDTO editedTask, BindingResult bindingResult, HttpServletRequest request) {
-        return ResponseEntity.ok(taskService.updateTask(id, taskId, editedTask, request));
+    public ResponseEntity<Object> updateTaskByBoardId(@PathVariable String id, @PathVariable Integer taskId, @Valid @RequestBody TaskAddEditDTO editedTask,  BindingResult bindingResult, HttpServletRequest request) {
+        return ResponseEntity.ok(taskService.updateTask(id, taskId,editedTask, request));
     }
 
     @DeleteMapping("/{id}/tasks/{taskId}")
@@ -175,12 +178,12 @@ public class BoardUserController {
 
     // SPRINT 5 ENDPOINTS
     @GetMapping("/{id}/collabs/invitations")
-    public ResponseEntity<Object> getInvitationsByBoardId(@PathVariable String id,HttpServletRequest request) {
-        return ResponseEntity.ok(invitationService.getInvitationsByBoardId(id,request));
+    public ResponseEntity<Object> getUserInvitedByBoardId(@PathVariable String id,HttpServletRequest request) {
+        return ResponseEntity.ok(invitationService.getUserInvitedByBoardId(id,request));
     }
 
     @PostMapping("/{id}/collabs/invitations")
-    public ResponseEntity<Object> acceptInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request, @RequestHeader(value = "Origin", required = false) String origin) {
+    public ResponseEntity<Object> createInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request, @RequestHeader(value = "Origin", required = false) String origin) {
         return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(id,collab, request,origin));
     }
 
@@ -194,6 +197,13 @@ public class BoardUserController {
        return ResponseEntity.ok(invitationService.declineInvitation(id,oid,request));
     }
 
+
+
+
+
+
+
+    
 
 
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.sql.Timestamp;
 import java.time.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -31,6 +32,9 @@ public class Task {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="boardId")
     private Board board;
+
+    @OneToMany(mappedBy = "tasks", fetch = FetchType.EAGER)
+    private List<File> files;
 
 
     @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)

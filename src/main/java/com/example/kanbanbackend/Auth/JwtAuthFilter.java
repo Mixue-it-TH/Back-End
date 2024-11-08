@@ -94,8 +94,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         return;
                     }
 
-
-
                     //handle getBoardLiast ของ user เพื่อไม่ไปทับลายกับ get method อื่นๆด้านล่าง
                     if (request.getRequestURI().contains("/v3/boards/user")) {
                         chain.doFilter(request, response);
@@ -103,15 +101,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     }
 
                     // HANDLE เขียนเพิ่มให้หน่อย ถ้าหาก method เป็น GET และเป็น path ของ /boards/xxxxx/collabs ให้ผ่านไปเลย
-                    if(request.getRequestURI().contains("collabs")){
+
+                    // handel  /boards/xxxxx/collabs
+                    if(permission.getNewPermissionCollab(boardId, claims.get("oid").toString(),request.getMethod(),request.getRequestURI())){
                         chain.doFilter(request, response);
                         return;
                     }
 
-                    // Invitations กันเพิ่มให้หน่อย เอาคล้ายๆ permission ของ collabs มาใช้
-                    if(request.getRequestURI().contains("invitations")){
-                        chain.doFilter(request, response);
-                        return;
+                    // handle Invitations
+                    if (request.getRequestURI().contains("invitations")) {
+                        try {
+                            if (permission.getPermissionOfInvitation(boardId, claims.get("oid").toString(), request.getMethod(), request.getRequestURI())) {
+                                chain.doFilter(request, response);
+                                return;
+                            } else {
+                                sendErrorResponse(response, HttpStatus.FORBIDDEN, "You do not have permission to access this invitation", request);
+                                return;
+                            }
+                        } catch (ItemNotFoundException e) {
+                            sendErrorResponse(response, HttpStatus.NOT_FOUND, e.getMessage(), request);
+                            return;
+                        }
                     }
 
                     try {
@@ -129,6 +139,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         return;
                     }
 
+
                 }
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "JWT Token does not begin with Bearer String");
@@ -141,7 +152,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (request.getMethod().equals("GET") && visibilityConfig.visibilityType(boardId)) {
                     chain.doFilter(request, response);
                     return;
-                } else if(!request.getMethod().equals("GET")){
+                } else if(request.getRequestURI().endsWith("collabs") && request.getMethod().equals("GET")){
+                    chain.doFilter(request, response);
+                    return;
+                }
+
+                else if(!request.getMethod().equals("GET")){
                     sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "You have to login to do this service", request);
                     return;
                 }

@@ -7,6 +7,7 @@ import com.example.kanbanbackend.DTO.PersonalBoardDTO;
 import com.example.kanbanbackend.Entitites.Primary.Board;
 import com.example.kanbanbackend.Entitites.Primary.Collaborator;
 import com.example.kanbanbackend.Entitites.Primary.Invitation;
+import com.example.kanbanbackend.Exception.BadRequestException;
 import com.example.kanbanbackend.Exception.ConflictException;
 import com.example.kanbanbackend.Exception.ForBiddenException;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
@@ -120,6 +121,13 @@ public class CollaboratorService {
 
 
         Invitation invitation = invitationRepository.findInvitationByBoard_IdAndUser_Oid(boardId, claims.get("oid").toString());
+        if(invitation == null) {
+            throw new BadRequestException("The problem has occure about this invite" );
+        }
+
+        if(invitation.getInviterName() == claims.get("name")){
+            throw new BadRequestException("You can't add yourself to collaborator");
+        }
 
         // CHECK userId that exist in DB 404
         com.example.kanbanbackend.Entitites.Primary.User userPrimary = primaryUserRepository.findUsersByOid(invitation.getUser().getOid());
@@ -130,6 +138,9 @@ public class CollaboratorService {
 
         // CHECK boardId that exist in DB 404
         Board board = boardRepository.findBoardById(boardId);
+        if(board == null){
+            throw new ItemNotFoundException("Board id " + boardId + " not found");
+        }
         List<Collaborator> ListOwner = repository.findCollaboratorByBoard_IdAndRole(boardId, "OWNER");
         Collaborator owner = ListOwner.get(0);
 

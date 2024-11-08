@@ -55,7 +55,7 @@ public class InvitationService {
     @Autowired
     private ClaimsUtil claimsUtil;
 
-    public InvitationResDTO getInvitationsByBoardId(String boardId, HttpServletRequest request) {
+    public InvitationResDTO getUserInvitedByBoardId(String boardId, HttpServletRequest request) {
         Claims claims = claimsUtil.getClaims(request);
         String oid = (String) claims.get("oid");
 
@@ -63,7 +63,7 @@ public class InvitationService {
 
         // 404 IF NOT FOUND
         if (invitation == null) {
-            throw new ItemNotFoundException("Board id: " + boardId + " or User not found");
+            throw new ItemNotFoundException("Board id: " + boardId + " or User not invited");
         }
 
         InvitationResDTO invitationResDTO = new InvitationResDTO();
@@ -80,10 +80,17 @@ public class InvitationService {
         Claims claims = claimsUtil.getClaims(request);
         String oid = (String) claims.get("oid");
 
+        // CHECK THAT BOARD NOT EXIST 404
+        Board board = boardRepository.findBoardById(boardId);
+        if (board == null) {
+            throw new ItemNotFoundException("Board id: " + boardId + " not found");
+        }
+
         // CHECK token is owner of board 403
         Collaborator owner = collaboratorRepository.findCollaboratorByBoard_IdAndRoleAndUser_Oid(boardId, "OWNER", claims.get("oid").toString());
+
         if (owner == null) {
-            throw new ForBiddenException("You do not have permission to operate this resource");
+            throw new ForBiddenException("You can't add yourself to collaborator");
         }
 
         // CHECK email that exist in DB 404
@@ -92,21 +99,17 @@ public class InvitationService {
         if (user == null) {
             throw new ItemNotFoundException("User not found");
         }
-//
-//        // CHECK THAT BOARD NOT EXIST 404
-        Board board = boardRepository.findBoardById(boardId);
-        if (board == null) {
-            throw new ItemNotFoundException("Board id: " + boardId + " not found");
-        }
-//
-//        // CHECK userId that exist in DB 404
+
+
+
+        // CHECK userId that exist in DB 404
         com.example.kanbanbackend.Entitites.Primary.User userPrimary = primaryUserRepository.findUsersByOid(user.getOid());
         if (userPrimary == null) {
             userPrimary = new com.example.kanbanbackend.Entitites.Primary.User(user.getOid(), user.getName(), user.getEmail());
             primaryUserRepository.save(userPrimary);
         }
 
-//        // CHECK email that have a conflict 409
+        // CHECK email that have a conflict 409
         List<Collaborator> collaboratorList = collaboratorRepository.findCollabaratorByBoard_Id(boardId);
         List<EmailDTO> emailDTOS = collaboratorList.stream()
                 .map(collaborator -> {
