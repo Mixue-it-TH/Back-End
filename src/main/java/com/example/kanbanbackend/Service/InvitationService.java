@@ -21,10 +21,12 @@ import com.example.kanbanbackend.Repository.Primary.PrimaryUserRepository;
 import com.example.kanbanbackend.Repository.Share.UserRepository;
 import com.example.kanbanbackend.Util.ClaimsUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +77,7 @@ public class InvitationService {
         return invitationResDTO;
     }
 
-    public InvitationResponseDTO createInvitation(String boardId, CollabRequestDTO collabRequestDTO, HttpServletRequest request,String origin) {
+    public InvitationResponseDTO createInvitation(String boardId, CollabRequestDTO collabRequestDTO, HttpServletRequest request,String origin) throws MessagingException, UnsupportedEncodingException {
         System.out.println(origin);
         Claims claims = claimsUtil.getClaims(request);
         String oid = (String) claims.get("oid");
@@ -140,7 +142,8 @@ public class InvitationService {
 
         String url = origin+"/board/"+ boardId + "/collab/invitations";
 
-        emailService.sendInvitationEmail("golfpopmei14@gmail.com", username, board.getBoardName(), collabRequestDTO.getAccess_right(),url);
+//        emailService.sendInvitationEmail("golfpopmei14@gmail.com", username, board.getBoardName(), collabRequestDTO.getAccess_right(),url);
+    emailService.sendInvitationEmail("golfpopmei14@gmail.com", username, board.getBoardName(), collabRequestDTO.getAccess_right(),url);
 
         return new InvitationResponseDTO(
                 savedCollab.getUser().getOid(),

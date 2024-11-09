@@ -22,8 +22,7 @@ public class File {
     @Column(name = "addedOn", nullable = false, insertable = false, updatable = false)
     private Timestamp addedOn;
 
-    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
-    private Timestamp updatedOn;
+    private Integer size;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="tasks_id")

@@ -1,20 +1,11 @@
 package com.example.kanbanbackend.Service;
 
-import com.example.kanbanbackend.DTO.FilesDTO.FileAddEditDTO;
-import com.example.kanbanbackend.DTO.FilesDTO.FileDTO;
-import com.example.kanbanbackend.Entitites.Primary.File;
-import com.example.kanbanbackend.Entitites.Primary.Task;
-import com.example.kanbanbackend.Exception.BadRequestException;
-import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Repository.Primary.FileRepository;
 import com.example.kanbanbackend.Repository.Primary.TaskRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class FileService {
