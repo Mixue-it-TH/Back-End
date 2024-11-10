@@ -7,23 +7,26 @@ import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
 import com.example.kanbanbackend.DTO.VisibilityDTO;
 import com.example.kanbanbackend.Entitites.Primary.Config;
-import com.example.kanbanbackend.Entitites.Primary.Task;
-import com.example.kanbanbackend.Exception.ItemNotFoundException;
 import com.example.kanbanbackend.Repository.Primary.TaskRepository;
-import com.example.kanbanbackend.Service.BoardService;
-import com.example.kanbanbackend.Service.CollaboratorService;
-import com.example.kanbanbackend.Service.StatusService;
-import com.example.kanbanbackend.Service.TaskService;
+import com.example.kanbanbackend.Service.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = {"http://ip23sy2.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th", "https://ip23sy2.sit.kmutt.ac.th", "https://intproj23.sit.kmutt.ac.th", "http://localhost:5173"})
@@ -31,17 +34,23 @@ import java.util.stream.Collectors;
 public class BoardUserController {
 
     @Autowired
+    FileService fileService;
+    @Autowired
     private CollaboratorService collaboratorService;
     @Autowired
     private BoardService boardService;
     @Autowired
     private TaskService taskService;
-
+    @Autowired
+    private InvitationService invitationService;
     @Autowired
     private StatusService statusService;
-
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private CloudinaryService cloudinaryService;
+    @Autowired
+    private ModelMapper modelMapper;
 
     //    @GetMapping("")
 //    public ResponseEntity<Object> getAllBoardUser() {
@@ -84,17 +93,36 @@ public class BoardUserController {
 
     @PostMapping("/{id}/tasks")
     public ResponseEntity<Object> addTask(@PathVariable String id, @Valid @RequestBody TaskAddEditDTO newTaskDTO, HttpServletRequest request) {
-
         return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(id, newTaskDTO, request));
     }
+@PutMapping("/{id}/tasks/{taskId}")
+public ResponseEntity<Object> updateTaskByBoardId(
+        @PathVariable String id,
+        @PathVariable Integer taskId,
+        @RequestParam("editedTask") String taskData,
+        @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments,
+        HttpServletRequest request) throws IOException {
 
-    @PutMapping("/{id}/tasks/{taskId}")
-    public ResponseEntity<Object> updateTaskByBoardId(@PathVariable String id, @PathVariable Integer taskId, @Valid @RequestBody TaskAddEditDTO editedTask, BindingResult bindingResult, HttpServletRequest request) {
-        return ResponseEntity.ok(taskService.updateTask(id, taskId, editedTask, request));
+    ObjectMapper objectMapper = new ObjectMapper();
+    TaskAddEditDTO editedTask = objectMapper.readValue(taskData, TaskAddEditDTO.class);
+
+    return ResponseEntity.ok(taskService.updateTask(id, taskId, editedTask, attachments, request));
+}
+
+    @PostMapping(value = "/{id}/tasks/{taskId}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Object> uploadFile(
+            @PathVariable String id,
+            @PathVariable Integer taskId,
+            @RequestParam(value = "fileList", required = false) List<MultipartFile> files
+    ) throws IOException {
+        if (files == null) {
+            files = Collections.emptyList();
+        }
+        return ResponseEntity.ok(cloudinaryService.uploadFiles(files));
     }
 
     @DeleteMapping("/{id}/tasks/{taskId}")
-    public ResponseEntity<Object> deleteTask(@PathVariable String id, @PathVariable Integer taskId, HttpServletRequest request) {
+    public ResponseEntity<Object> deleteTask(@PathVariable String id, @PathVariable Integer taskId, HttpServletRequest request) throws Exception {
         return ResponseEntity.ok(taskService.deleteTask(id, taskId, request));
     }
 
@@ -159,8 +187,8 @@ public class BoardUserController {
     }
 
     @PostMapping("/{id}/collabs")
-    public ResponseEntity<Object> addCollab(@PathVariable String id, @Valid @RequestBody CollabRequestDTO callab, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(collaboratorService.addCollab(id, callab, request));
+    public ResponseEntity<Object> addCollab(@PathVariable String id, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(collaboratorService.addCollab(id, request));
     }
 
     @PatchMapping("/{id}/collabs/{collabId}")
@@ -171,6 +199,27 @@ public class BoardUserController {
     @DeleteMapping("/{id}/collabs/{collabId}")
     public ResponseEntity<Object> deleteCollab(@PathVariable String id, @PathVariable String collabId, HttpServletRequest request) {
         return ResponseEntity.ok(collaboratorService.deleteCollab(id, collabId, request));
+    }
+
+    // SPRINT 5 ENDPOINTS
+    @GetMapping("/{id}/collabs/invitations")
+    public ResponseEntity<Object> getUserInvitedByBoardId(@PathVariable String id, HttpServletRequest request) {
+        return ResponseEntity.ok(invitationService.getUserInvitedByBoardId(id, request));
+    }
+
+    @PostMapping("/{id}/collabs/invitations")
+    public ResponseEntity<Object> createInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request, @RequestHeader(value = "Origin", required = false) String origin) throws MessagingException, UnsupportedEncodingException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(id, collab, request, origin));
+    }
+
+    @PatchMapping("/{id}/collabs/invitations/{oid}")
+    public ResponseEntity<Object> updateInvitation(@PathVariable String id, @PathVariable String oid, @Valid @RequestBody AccessDTO access, HttpServletRequest request) {
+        return ResponseEntity.ok(invitationService.updateInvitation(id, oid, access, request));
+    }
+
+    @DeleteMapping("/{id}/collabs/invitations/{oid}")
+    public ResponseEntity<Object> declineInvitation(@PathVariable String id, @PathVariable String oid, HttpServletRequest request) {
+        return ResponseEntity.ok(invitationService.declineInvitation(id, oid, request));
     }
 
 
