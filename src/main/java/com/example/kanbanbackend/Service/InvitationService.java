@@ -78,7 +78,6 @@ public class InvitationService {
     }
 
     public InvitationResponseDTO createInvitation(String boardId, CollabRequestDTO collabRequestDTO, HttpServletRequest request,String origin) throws MessagingException, UnsupportedEncodingException {
-        System.out.println(origin);
         Claims claims = claimsUtil.getClaims(request);
         String oid = (String) claims.get("oid");
 
@@ -142,8 +141,7 @@ public class InvitationService {
 
         String url = origin+"/board/"+ boardId + "/collab/invitations";
 
-//        emailService.sendInvitationEmail("golfpopmei14@gmail.com", username, board.getBoardName(), collabRequestDTO.getAccess_right(),url);
-    emailService.sendInvitationEmail("golfpopmei14@gmail.com", username, board.getBoardName(), collabRequestDTO.getAccess_right(),url);
+    emailService.sendInvitationEmail(email, username, board.getBoardName(), collabRequestDTO.getAccess_right(),url);
 
         return new InvitationResponseDTO(
                 savedCollab.getUser().getOid(),

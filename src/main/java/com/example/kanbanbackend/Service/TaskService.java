@@ -346,7 +346,7 @@ public class TaskService {
 
     @Transactional
     public Map<String, Object> addFiles(String boardId, Integer taskId, List<MultipartFile> files, HttpServletRequest request) throws IOException {
-       //List<FileDTO>
+
         Task taskBoard = repository.findTaskByBoard_IdAndId(boardId, taskId);
         if (taskBoard == null) throw new ItemNotFoundException("Task id: " + taskId + " or boardId: "+ boardId +" doesn't exist !!!");
 
@@ -383,8 +383,8 @@ public class TaskService {
                     continue;
                 }
                 // UPLOAD FILE TO CLOUDINARY
-                Map result = cloudinaryService.uploadFile(file);
-
+                String resourceType = cloudinaryService.getResourceType(file);
+                Map result = cloudinaryService.uploadFile(file,resourceType);
                 // Create a new file
                 File newFile = new File();
                 newFile.setId(result.get("public_id").toString());
