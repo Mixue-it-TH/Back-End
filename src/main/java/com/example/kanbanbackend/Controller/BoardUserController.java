@@ -47,8 +47,7 @@ public class BoardUserController {
     private StatusService statusService;
     @Autowired
     private TaskRepository taskRepository;
-    @Autowired
-    private CloudinaryService cloudinaryService;
+
     @Autowired
     private ModelMapper modelMapper;
 
@@ -108,18 +107,6 @@ public ResponseEntity<Object> updateTaskByBoardId(
 
     return ResponseEntity.ok(taskService.updateTask(id, taskId, editedTask, attachments, request));
 }
-
-    @PostMapping(value = "/{id}/tasks/{taskId}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Object> uploadFile(
-            @PathVariable String id,
-            @PathVariable Integer taskId,
-            @RequestParam(value = "fileList", required = false) List<MultipartFile> files
-    ) throws IOException {
-        if (files == null) {
-            files = Collections.emptyList();
-        }
-        return ResponseEntity.ok(cloudinaryService.uploadFiles(files));
-    }
 
     @DeleteMapping("/{id}/tasks/{taskId}")
     public ResponseEntity<Object> deleteTask(@PathVariable String id, @PathVariable Integer taskId, HttpServletRequest request) throws Exception {
