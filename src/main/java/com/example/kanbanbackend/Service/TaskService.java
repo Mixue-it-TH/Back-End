@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -48,8 +49,9 @@ public class TaskService {
 
     @Autowired
     private BoardRepository boardRepository;
+
     @Autowired
-    private CloudinaryService cloudinaryService;
+    private AmazonS3Service amazonS3Service;
 
     @Autowired
     private StatusService statusService;
@@ -270,11 +272,8 @@ public class TaskService {
             List<String> publicIds = new ArrayList<>();
 
             for (File file : files) {
-                publicIds.add(file.getId());
+                amazonS3Service.deleteFile(file.getUrl());
             }
-
-            cloudinaryService.deleteFiles(publicIds);
-
             fileRepository.deleteAll(files);
         }
 
@@ -383,13 +382,16 @@ public class TaskService {
                     continue;
                 }
                 // UPLOAD FILE TO CLOUDINARY
-                String resourceType = cloudinaryService.getResourceType(file);
-                Map result = cloudinaryService.uploadFile(file,resourceType);
+
+
+                String nanoId = NanoId.generate(10);
+
+                URL result = amazonS3Service.uploadFile(file,fileName);
                 // Create a new file
                 File newFile = new File();
-                newFile.setId(result.get("public_id").toString());
+                newFile.setId(nanoId);
                 newFile.setName(fileName);
-                newFile.setUrl(result.get("url").toString());
+                newFile.setUrl(result.toString());
                 newFile.setTasks(taskBoard);
                 newFile.setSize((int) file.getSize());
                 filesToAdd.add(newFile);
@@ -441,7 +443,7 @@ public class TaskService {
             }
             File fileResultDelete = fileExist.get();
 
-            cloudinaryService.deleteFile(fileId);
+            amazonS3Service.deleteFile(fileResultDelete.getUrl());
             fileRepository.deleteById(fileId);
             deletedFiles.add(new FileDTO(fileId, fileResultDelete.getName(), fileResultDelete.getUrl(),fileResultDelete.getSize()));  // คุณสามารถตั้งค่าข้อมูลไฟล์ที่ต้องการส่งกลับได้
         }
