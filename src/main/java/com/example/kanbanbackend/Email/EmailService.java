@@ -21,13 +21,13 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 
-            helper.setFrom("noreply@intproj23.sit.kmutt.ac.th", "ITBKK-SY2");
+            helper.setFrom("chaimongkon.sokg@hotmail.com", "ITBKK-SY2");
             helper.setReplyTo("noreply@intproj23.sit.kmutt.ac.th");
             helper.setTo(to);
             helper.setSubject(inviterName + " has invited you to collaborate with " + accessRight + " access right on '" + boardName + "' board");
             helper.setText(inviterName + " has invited you to collaborate with " + accessRight + " access right on '" + boardName + "' board. "
                     + "You have been invited to collaborate on the board. Click the following link to accept the invitation:\n"
-                    + url);
+                    + url,true);
 
             mailSender.send(mimeMessage);
         } catch (MessagingException | UnsupportedEncodingException e) {
