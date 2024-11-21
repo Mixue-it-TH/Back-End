@@ -167,6 +167,7 @@ public class InvitationService {
 
         emailService.sendInvitationEmail(email, username, board.getBoardName(), collabRequestDTO.getAccess_right(), url);
 
+
         return new InvitationResponseDTO(
                 savedCollab.getUser().getOid(),
                 savedCollab.getStatus(),
