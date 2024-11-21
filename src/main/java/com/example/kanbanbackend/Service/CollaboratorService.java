@@ -8,6 +8,7 @@ import com.example.kanbanbackend.Entitites.Primary.Board;
 import com.example.kanbanbackend.Entitites.Primary.Collaborator;
 import com.example.kanbanbackend.Entitites.Primary.Invitation;
 import com.example.kanbanbackend.Exception.BadRequestException;
+import org.springframework.security.core.Authentication;
 import com.example.kanbanbackend.Exception.ConflictException;
 import com.example.kanbanbackend.Exception.ForBiddenException;
 import com.example.kanbanbackend.Exception.ItemNotFoundException;
@@ -109,16 +110,12 @@ public class CollaboratorService {
         return collabDTO;
     }
 
-    public CollaboratorResponseDTO addCollab(String boardId, HttpServletRequest request) {
+    public CollaboratorResponseDTO addCollab(String boardId, HttpServletRequest request,Authentication authentication) {
         String token = request.getHeader("Authorization").substring(7).trim();
         Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
 
+
         // CHECK that request by user itself 403
-
-
-
-        ///////////////////////////////////////
-
 
         Invitation invitation = invitationRepository.findInvitationByBoard_IdAndUser_Oid(boardId, claims.get("oid").toString());
         if(invitation == null) {

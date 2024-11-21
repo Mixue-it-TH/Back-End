@@ -50,13 +50,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
+
         if (request.getRequestURI().startsWith("/swagger-ui") || request.getRequestURI().startsWith("/v3/api-docs")) {
             chain.doFilter(request, response);
             return;
         }
 
 
-        if (request.getRequestURI().equals("/login")) { //handle ให้ login โดยไม่มี token ได้
+        if (request.getRequestURI().startsWith("/login") || request.getRequestURI().startsWith("/logout")) {
+            String redirectParam = request.getParameter("redirect");
+            request.getSession().setAttribute("redirect", redirectParam);
             chain.doFilter(request, response);
             return;
         }

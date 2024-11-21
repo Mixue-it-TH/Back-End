@@ -33,7 +33,12 @@ public class AmazonS3Service {
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());
-        metadata.setContentType(file.getContentType());
+        String contentType = file.getContentType();
+        if ("text/plain".equals(contentType)) {
+            metadata.setContentType("text/plain; charset=UTF-8");
+        } else {
+            metadata.setContentType(contentType);
+        }
 
         amazonS3.putObject(new PutObjectRequest(bucketName, uploadFilename, file.getInputStream(), metadata));
 
