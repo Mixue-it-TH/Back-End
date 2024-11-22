@@ -111,15 +111,13 @@ public class InvitationService {
         if (!email.endsWith("@ad.sit.kmutt.ac.th")) {
             throw new BadRequestException("Only 'ad.sit.kmutt.ac.th' domain is supported.");
         }
-        System.out.println(authentication.getPrincipal());
 
         // CHECK THAT USER HAVE AUTHENTICATION
         if (authentication != null && authentication.isAuthenticated()) {
-            System.out.println("AUTHENTICATED");
             user = fetchUserFromAzureAD(email, authentication);
         }
 
-
+        // CHECK THAT USER NOT IN DB
         if (user == null) {
             com.example.kanbanbackend.Entitites.Share.User shareUser = userRepository.findUsersByEmail(email);
             if (shareUser == null) {
@@ -182,7 +180,6 @@ public class InvitationService {
 
     public Invitation declineInvitation(String boardId, String userOid, HttpServletRequest request) {
         Claims claims = claimsUtil.getClaims(request);
-        String oid = (String) claims.get("oid");
 
         Invitation invitation = invitationRepository.findInvitationByBoard_IdAndUser_Oid(boardId, userOid);
 
@@ -199,7 +196,6 @@ public class InvitationService {
     public Map<String, String> updateInvitation(String boardId, String Useroid, AccessDTO accessRight, HttpServletRequest request) {
 
         Claims claims = claimsUtil.getClaims(request);
-        String oid = (String) claims.get("oid");
 
         Invitation invitation = invitationRepository.findInvitationByBoard_IdAndUser_Oid(boardId, Useroid);
 
@@ -221,11 +217,11 @@ public class InvitationService {
     public com.example.kanbanbackend.Entitites.Primary.User fetchUserFromAzureAD(String email, Authentication authentication) {
         String accessToken = userService.getMicrosoftAccessToken(authentication);
         if (accessToken == null) {
-            throw new UnauthorizedException("Access token is missing or expired.");
+            return null;
         }
 
         // Microsoft Graph API URL
-        String url = "https://graph.microsoft.com/v1.0/users?$filter=mail eq '" + email + "' or userPrincipalName eq '" + email + "'";
+        String url = "https://graph.microsoft.com/v1.0/users/" + email;
 
         // Set headers with the access token
         HttpHeaders headers = new HttpHeaders();
@@ -235,15 +231,14 @@ public class InvitationService {
         // Call the API
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+        Map userMap = response.getBody();
 
-        // Parse response
-        List<Map<String, Object>> users = (List<Map<String, Object>>) response.getBody().get("value");
-        if (users == null || users.isEmpty()) {
-            return null; // User not found
+        // Check if the user not exists
+        if(userMap == null){
+            return null;
         }
 
         // Map the result to your User object
-        Map<String, Object> userMap = users.get(0);
         return new com.example.kanbanbackend.Entitites.Primary.User(
                 (String) userMap.get("id"),
                 (String) userMap.get("displayName"),
