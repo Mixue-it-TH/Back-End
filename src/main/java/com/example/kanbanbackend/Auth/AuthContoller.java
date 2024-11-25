@@ -24,7 +24,7 @@ public class AuthContoller {
     @Autowired
     private UserService service;
 
-    @Value("${spring.profiles.active:dev}")
+    @Value("${spring.myconfig.active}")
     private String activeProfile;
     @GetMapping("")
     public void redirectToMicrosoftLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
