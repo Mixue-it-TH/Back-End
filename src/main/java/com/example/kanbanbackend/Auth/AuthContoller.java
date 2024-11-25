@@ -4,6 +4,7 @@ package com.example.kanbanbackend.Auth;
 import com.example.kanbanbackend.DTO.Token;
 import com.example.kanbanbackend.Repository.Primary.PrimaryUserRepository;
 import com.example.kanbanbackend.Service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,14 @@ public class AuthContoller {
 
 
     @GetMapping("")
-    public void redirectToMicrosoftLogin(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/oauth2/authorization/azure-dev");
+    public void redirectToMicrosoftLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String originalUrl = request.getRequestURL().toString();
+        if (!originalUrl.contains("/sy2")) {
+            String newUrl = "/sy2" + request.getRequestURI();
+            response.sendRedirect(newUrl);
+        } else {
+            response.sendRedirect("/oauth2/authorization/azure-dev");
+        }
     }
 
     @PostMapping("")
