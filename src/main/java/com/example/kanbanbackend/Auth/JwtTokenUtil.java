@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -63,20 +64,45 @@ public class JwtTokenUtil implements Serializable {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
-    public String generateToken(User user) {
+    public String generateToken(Object user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("iss", "https://intproj23.sit.kmutt.ac.th/sy2/");
-        claims.put("name",user.getName());
-        claims.put("oid",user.getOid());
-        claims.put("email",user.getEmail());
-        claims.put("role","owner");
-        return doGenerateToken(claims, user.getUsername(), JWT_TOKEN_VALIDITY);
+
+        if (user instanceof com.example.kanbanbackend.Entitites.Primary.User) {
+            com.example.kanbanbackend.Entitites.Primary.User primaryUser = (com.example.kanbanbackend.Entitites.Primary.User) user;
+            claims.put("name", primaryUser.getUserName());
+            claims.put("oid", primaryUser.getOid());
+            claims.put("email", primaryUser.getEmail());
+            claims.put("role", "owner");
+
+            return doGenerateToken(claims, transformName(primaryUser.getUserName()), JWT_TOKEN_VALIDITY);
+        } else if (user instanceof User) {
+            User sharedUser = (User) user;
+            claims.put("name", sharedUser.getName());
+            claims.put("oid", sharedUser.getOid());
+            claims.put("email", sharedUser.getEmail());
+            claims.put("role", "owner");
+            return doGenerateToken(claims, sharedUser.getUsername(), JWT_TOKEN_VALIDITY);
+        } else {
+            throw new IllegalArgumentException("Invalid user type");
+        }
     }
-    public String generateRefreshToken(User user) {
+
+    public String generateRefreshToken(Object user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("iss", "https://intproj23.sit.kmutt.ac.th/sy2/");
-        claims.put("oid",user.getOid());
-        return doGenerateToken(claims, user.getUsername(), refreshTokenValidity);
+        if (user instanceof com.example.kanbanbackend.Entitites.Primary.User) {
+            com.example.kanbanbackend.Entitites.Primary.User primaryUser = (com.example.kanbanbackend.Entitites.Primary.User) user;
+            claims.put("oid",primaryUser.getOid());
+            return doGenerateToken(claims, transformName(primaryUser.getUserName()), refreshTokenValidity);
+        }else if (user instanceof User) {
+            User sharedUser = (User) user;
+            claims.put("oid", sharedUser.getOid());
+            return doGenerateToken(claims, sharedUser.getUsername(), refreshTokenValidity);
+        } else {
+            throw new IllegalArgumentException("Invalid user type");
+        }
+
     }
 
 
@@ -113,5 +139,27 @@ public class JwtTokenUtil implements Serializable {
         String token = request.getHeader("Authorization").substring(7).trim();
         return getAllClaimsFromToken(token);
     }
+
+    public static String transformName(String fullName) {
+        if (fullName == null || fullName.isEmpty()) {
+            throw new IllegalArgumentException("Full name must not be null or empty");
+        }
+
+        String[] nameParts = fullName.split(" ");
+        if (nameParts.length < 2) {
+            throw new IllegalArgumentException("Full name must contain at least a first name and a last name");
+        }
+
+        String result;
+
+        if (nameParts[0].equalsIgnoreCase("ITBKK")) {
+            result = "itbkk." + nameParts[1].toLowerCase();
+        } else {
+            result = "itbkk." + nameParts[0].toLowerCase();
+        }
+
+        return result;
+    }
+
 
 }

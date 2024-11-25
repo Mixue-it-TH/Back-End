@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = {"http://ip23sy2.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th", "https://ip23sy2.sit.kmutt.ac.th", "https://intproj23.sit.kmutt.ac.th", "http://localhost:5173"})
+@CrossOrigin(origins = {"http://ip23sy2.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th", "https://ip23sy2.sit.kmutt.ac.th", "https://intproj23.sit.kmutt.ac.th", "http://localhost:5173"}, allowCredentials = "true")
 @RequestMapping("/v3/boards")
 public class BoardUserController {
 
@@ -174,8 +175,8 @@ public ResponseEntity<Object> updateTaskByBoardId(
     }
 
     @PostMapping("/{id}/collabs")
-    public ResponseEntity<Object> addCollab(@PathVariable String id, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(collaboratorService.addCollab(id, request));
+    public ResponseEntity<Object> addCollab(@PathVariable String id, HttpServletRequest request, Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(collaboratorService.addCollab(id, request,authentication));
     }
 
     @PatchMapping("/{id}/collabs/{collabId}")
@@ -195,8 +196,8 @@ public ResponseEntity<Object> updateTaskByBoardId(
     }
 
     @PostMapping("/{id}/collabs/invitations")
-    public ResponseEntity<Object> createInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request, @RequestHeader(value = "Origin", required = false) String origin) throws MessagingException, UnsupportedEncodingException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(id, collab, request, origin));
+    public ResponseEntity<Object> createInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request, @RequestHeader(value = "Origin", required = false) String origin,Authentication authentication) throws MessagingException, UnsupportedEncodingException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(id, collab, request, origin,authentication));
     }
 
     @PatchMapping("/{id}/collabs/invitations/{oid}")
