@@ -74,6 +74,7 @@ public class JwtTokenUtil implements Serializable {
             claims.put("oid", primaryUser.getOid());
             claims.put("email", primaryUser.getEmail());
             claims.put("role", "owner");
+
             return doGenerateToken(claims, transformName(primaryUser.getUserName()), JWT_TOKEN_VALIDITY);
         } else if (user instanceof User) {
             User sharedUser = (User) user;
@@ -145,13 +146,20 @@ public class JwtTokenUtil implements Serializable {
         }
 
         String[] nameParts = fullName.split(" ");
-        if (nameParts.length < 1) {
-            throw new IllegalArgumentException("Full name must contain at least a first name");
+        if (nameParts.length < 2) {
+            throw new IllegalArgumentException("Full name must contain at least a first name and a last name");
         }
 
-        String firstName = nameParts[0].toLowerCase();
+        String result;
 
-        return "itbkk." + firstName;
+        if (nameParts[0].equalsIgnoreCase("ITBKK")) {
+            result = "itbkk." + nameParts[1].toLowerCase();
+        } else {
+            result = "itbkk." + nameParts[0].toLowerCase();
+        }
+
+        return result;
     }
+
 
 }

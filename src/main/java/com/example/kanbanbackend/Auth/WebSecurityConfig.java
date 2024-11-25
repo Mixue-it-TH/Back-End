@@ -42,12 +42,7 @@ public class WebSecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             // Must clear the session before redirecting to the logout URL
-                            if (authentication == null) {
-                                System.out.println("Authentication has been cleared.");
-                            } else {
-                                System.out.println("Authentication is still present: " + authentication.getName());
-                                SecurityContextHolder.clearContext();
-                            }
+                            SecurityContextHolder.clearContext();
 
                             String postLogoutRedirectUri = request.getQueryString();
                             String microsoftLogoutUrl = "https://login.microsoftonline.com/common/oauth2/logout";

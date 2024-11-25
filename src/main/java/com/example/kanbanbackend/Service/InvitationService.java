@@ -229,21 +229,25 @@ public class InvitationService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // Call the API
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
-        Map userMap = response.getBody();
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            Map userMap = response.getBody();
 
-        // Check if the user not exists
-        if(userMap == null){
+            if (userMap == null || userMap.isEmpty()) {
+                return null;
+            }
+
+            // Map the result to your User object
+            return new com.example.kanbanbackend.Entitites.Primary.User(
+                    (String) userMap.get("id"),
+                    (String) userMap.get("displayName"),
+                    (String) userMap.get("mail")
+            );
+
+        } catch (Exception e) {
             return null;
         }
-
-        // Map the result to your User object
-        return new com.example.kanbanbackend.Entitites.Primary.User(
-                (String) userMap.get("id"),
-                (String) userMap.get("displayName"),
-                (String) userMap.get("mail")
-        );
     }
 
 }
