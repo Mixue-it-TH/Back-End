@@ -28,8 +28,10 @@ public class AuthContoller {
     public void redirectToMicrosoftLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String originalUrl = request.getRequestURL().toString();
         if (!originalUrl.contains("/sy2")) {
-            String newUrl = "/sy2" + request.getRequestURI();
-            response.sendRedirect(newUrl);
+            String host = request.getHeader("X-Forwarded-Host");
+            String protocol = request.getHeader("X-Forwarded-Proto");
+            String fullUrl = protocol + "://" + host + "/sy2/api/oauth2/authorization/azure-dev";
+            response.sendRedirect(fullUrl);
         } else {
             response.sendRedirect("/oauth2/authorization/azure-dev");
         }
