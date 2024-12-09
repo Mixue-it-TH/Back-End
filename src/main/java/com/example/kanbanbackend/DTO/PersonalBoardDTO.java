@@ -18,5 +18,6 @@ public class PersonalBoardDTO {
     private Visibility boardVisibility;
     @JsonProperty("owner")
     private OwnerDTO user;
-
+    @JsonProperty("theme")
+    private String theme;
 }

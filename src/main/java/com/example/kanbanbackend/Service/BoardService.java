@@ -5,7 +5,9 @@ import com.example.kanbanbackend.Config.Permission;
 import com.example.kanbanbackend.Config.VisibilityConfig;
 import com.example.kanbanbackend.DTO.CollabsDTO.CollabDTO;
 import com.example.kanbanbackend.DTO.InvitationDTO.InvitationDTO;
+import com.example.kanbanbackend.DTO.OwnerDTO;
 import com.example.kanbanbackend.DTO.PersonalBoardDTO;
+import com.example.kanbanbackend.DTO.ThemeDTO;
 import com.example.kanbanbackend.DTO.VisibilityDTO;
 import com.example.kanbanbackend.Entitites.Primary.*;
 import com.example.kanbanbackend.Exception.BadRequestException;
@@ -69,7 +71,7 @@ public class BoardService {
         User user = primaryUserRepository.saveAndFlush(new User(oid, name, email));
 
 
-        Board newBoard = boardRepository.saveAndFlush(new Board(NanoId.generate(10), boardDTO.getBoardName(), config, Visibility.PRIVATE));
+        Board newBoard = boardRepository.saveAndFlush(new Board(NanoId.generate(10), boardDTO.getBoardName(), config, Visibility.PRIVATE, "default"));
 
         Collaborator boardUser = boardUserRepository.saveAndFlush(new Collaborator(user, newBoard, role, "WRITE", name));
 
@@ -86,6 +88,7 @@ public class BoardService {
         }
 
 
+
         return mapper.map(boardUser, PersonalBoardDTO.class);
     }
 
@@ -94,7 +97,20 @@ public class BoardService {
         if (boardUserList.isEmpty()) {
             throw new ItemNotFoundException("Board id '" + boardId + "' not found");
         }
-        return mapper.map(boardUserList.get(0), PersonalBoardDTO.class);
+
+        Collaborator collaborator = boardUserList.get(0);
+        Board board = collaborator.getBoard();
+
+        PersonalBoardDTO dto = new PersonalBoardDTO();
+        dto.setBoardId(board.getId());
+        dto.setBoardName(board.getBoardName());
+        dto.setBoardVisibility(board.getVisibility());
+        dto.setTheme(board.getTheme()); // ตรวจสอบตรงนี้
+        dto.setUser(new OwnerDTO(collaborator.getUser().getOid(), collaborator.getOwnerName()));
+        return dto;
+
+
+//        return mapper.map(boardUserList.get(0), PersonalBoardDTO.class);
 
 
     }
@@ -156,5 +172,17 @@ public class BoardService {
         response.put("invitations", invitationDTOS);
 
         return response;
+    }
+
+    public ThemeDTO setTheme(String boardId, ThemeDTO theme, HttpServletRequest request) {
+        Board board = boardRepository.findBoardById(boardId);
+        if (board == null) {
+            throw new ItemNotFoundException("Board id '" + boardId + "' not found");
+        }
+            board.setTheme(theme.getTheme());
+            boardRepository.saveAndFlush(board);
+            ThemeDTO themeDTO = new ThemeDTO();
+            themeDTO.setTheme(theme.getTheme());
+            return themeDTO;
     }
 }

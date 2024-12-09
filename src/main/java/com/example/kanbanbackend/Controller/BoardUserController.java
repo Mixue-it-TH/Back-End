@@ -5,6 +5,7 @@ import com.example.kanbanbackend.DTO.CollabsDTO.CollabRequestDTO;
 import com.example.kanbanbackend.DTO.PersonalBoardDTO;
 import com.example.kanbanbackend.DTO.StatusDTO.StatusDTO;
 import com.example.kanbanbackend.DTO.TaskDTO.TaskAddEditDTO;
+import com.example.kanbanbackend.DTO.ThemeDTO;
 import com.example.kanbanbackend.DTO.VisibilityDTO;
 import com.example.kanbanbackend.Entitites.Primary.Config;
 import com.example.kanbanbackend.Repository.Primary.TaskRepository;
@@ -210,5 +211,9 @@ public ResponseEntity<Object> updateTaskByBoardId(
         return ResponseEntity.ok(invitationService.declineInvitation(id, oid, request));
     }
 
+    @PatchMapping("/{id}/theme")
+    public ResponseEntity<Object> updateTheme(@PathVariable String id, @Valid @RequestBody ThemeDTO themeDTO, HttpServletRequest request) {
+        return ResponseEntity.ok(boardService.setTheme(id, themeDTO, request));
+    }
 
 }

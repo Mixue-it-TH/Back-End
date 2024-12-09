@@ -63,7 +63,6 @@ public class CollaboratorService {
         String token = request.getHeader("Authorization").substring(7).trim();
         Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
         String oid = (String) claims.get("oid");
-
         List<Collaborator> boardOwnerList = repository.findCollaboratorByUser_OidAndRole(oid, "OWNER");
         List<PersonalBoardDTO> personalBoardDTOs = listMapper.mapList(boardOwnerList, PersonalBoardDTO.class);
 
