@@ -4,9 +4,11 @@ package com.example.kanbanbackend.Auth;
 import com.example.kanbanbackend.DTO.Token;
 import com.example.kanbanbackend.Repository.Primary.PrimaryUserRepository;
 import com.example.kanbanbackend.Service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -22,10 +24,21 @@ public class AuthContoller {
     @Autowired
     private UserService service;
 
-
+    @Value("${spring.myconfig.active}")
+    private String activeProfile;
     @GetMapping("")
-    public void redirectToMicrosoftLogin(HttpServletResponse response) throws IOException {
+    public void redirectToMicrosoftLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String originalUrl = request.getRequestURL().toString();
+        if ("prod".equalsIgnoreCase(activeProfile) && !originalUrl.contains("/sy2")) {
+            String host = request.getHeader("X-Forwarded-Host");
+            String protocol = request.getHeader("X-Forwarded-Proto");
+            String fullUrl = protocol + "://" + host + "/sy2/api/oauth2/authorization/azure-dev";
+            if(host != null && protocol != null) {
+                response.sendRedirect(fullUrl);
+            }
+        }
         response.sendRedirect("/oauth2/authorization/azure-dev");
+
     }
 
     @PostMapping("")

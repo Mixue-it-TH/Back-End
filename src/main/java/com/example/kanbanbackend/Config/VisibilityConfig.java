@@ -17,7 +17,7 @@ public class VisibilityConfig {
         Board board = boardRepository.findBoardById(boardId);
 
         if(board == null){
-            throw new ItemNotFoundException("Board id '"+boardId+"' not found kiyyyy");
+            throw new ItemNotFoundException("Board id '"+boardId+"' not found");
         }
         if(board.getVisibility() == Visibility.PUBLIC){
             return true;
