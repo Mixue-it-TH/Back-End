@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PersonalBoardDTO {
     @JsonProperty("id")
     private String boardId;
@@ -18,5 +18,6 @@ public class PersonalBoardDTO {
     private Visibility boardVisibility;
     @JsonProperty("owner")
     private OwnerDTO user;
-
+    @JsonProperty("theme")
+    private String theme;
 }

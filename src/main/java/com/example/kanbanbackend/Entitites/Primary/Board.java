@@ -24,11 +24,14 @@ public class Board {
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
-    public Board(String id,String boardName, Config configId, Visibility visibility) {
+    private String theme;
+
+    public Board(String id,String boardName, Config configId, Visibility visibility, String theme) {
         this.id = id;
         this.boardName = boardName;
         this.configId = configId;
         this.visibility = visibility;
+        this.theme = theme;
     }
 
     public Board() {

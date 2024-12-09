@@ -8,4 +8,11 @@ public class OwnerDTO {
     private String oid;
     @JsonProperty("name")
     private String userName;
+    public OwnerDTO() {
+    }
+
+    public OwnerDTO(String oid, String userName) {
+        this.oid = oid;
+        this.userName = userName;
+    }
 }
