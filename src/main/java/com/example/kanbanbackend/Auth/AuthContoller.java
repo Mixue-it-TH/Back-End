@@ -29,6 +29,7 @@ public class AuthContoller {
     @GetMapping("")
     public void redirectToMicrosoftLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String originalUrl = request.getRequestURL().toString();
+                System.out.println(originalUrl);
         if ("prod".equalsIgnoreCase(activeProfile) && !originalUrl.contains("/sy2")) {
             String host = request.getHeader("X-Forwarded-Host");
             String protocol = request.getHeader("X-Forwarded-Proto");
