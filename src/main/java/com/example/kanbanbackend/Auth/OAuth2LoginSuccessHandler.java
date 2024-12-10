@@ -19,21 +19,15 @@ import java.util.Map;
 @Component
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Autowired
-    private final OAuth2AuthorizedClientService authorizedClientService;
 
     @Autowired
     private PrimaryUserRepository primaryUserRepository;
-
-
-    public OAuth2LoginSuccessHandler(OAuth2AuthorizedClientService authorizedClientService) {
-        this.authorizedClientService = authorizedClientService;
-    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
+        System.out.println(authentication);
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> oauth2UserAttributes = oauth2User.getAttributes();
 
@@ -50,6 +44,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
 
         String redirectAfterLogin = (String) request.getSession().getAttribute("redirect");
+        System.out.println(redirectAfterLogin);
 
         response.sendRedirect(redirectAfterLogin);
     }
