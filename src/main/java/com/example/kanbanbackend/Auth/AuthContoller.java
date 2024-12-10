@@ -41,6 +41,8 @@ public class AuthContoller {
 
     }
 
+
+
     @PostMapping("")
     public ResponseEntity<Token> Login(@Valid @RequestBody JwtRequestUser user) {
         return ResponseEntity.ok(service.login(user));

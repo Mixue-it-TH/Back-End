@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.net.URLEncoder;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -37,7 +39,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth2 -> oauth2.successHandler(oauth2LoginSuccessHandler).loginPage("/login"))
+                .oauth2Login(oauth2 -> oauth2.successHandler(oauth2LoginSuccessHandler)
+                      .loginPage("/login"))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
