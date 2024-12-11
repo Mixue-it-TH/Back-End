@@ -1,6 +1,8 @@
 package com.example.kanbanbackend.Service;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import io.viascom.nanoid.NanoId;
@@ -13,6 +15,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 
 @Service
@@ -24,9 +27,8 @@ public class AmazonS3Service {
     @Value("${aws.s3.bucket_name}")
     private String bucketName;
 
-    public URL uploadFile(MultipartFile file,String fileName) throws IOException {
-
-        String uploadFilename = NanoId.generate(10)+fileName;
+    public String uploadFile(MultipartFile file, String fileName) throws IOException {
+        String uploadFilename = NanoId.generate(10) + "_" + fileName;
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());
@@ -39,14 +41,31 @@ public class AmazonS3Service {
 
         amazonS3.putObject(new PutObjectRequest(bucketName, uploadFilename, file.getInputStream(), metadata));
 
-        return amazonS3.getUrl(bucketName, uploadFilename);
+        return uploadFilename;
     }
+
 
 
     public void deleteFile(String fileUrl) {
         String fileKey = extractFileKeyFromUrl(fileUrl);
         fileKey = URLDecoder.decode(fileKey, StandardCharsets.UTF_8);
         amazonS3.deleteObject(bucketName, fileKey);
+    }
+
+    public String generatePresignedUrl(String objectKey, int expirationInMinutes) {
+        Date expiration = new Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * expirationInMinutes;
+        expiration.setTime(expTimeMillis);
+
+        // Presign URL
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                new GeneratePresignedUrlRequest(bucketName, objectKey)
+                        .withMethod(HttpMethod.GET)
+                        .withExpiration(expiration);
+        URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
+
+        return url.toString();
     }
 
     private String extractFileKeyFromUrl(String fileUrl) {

@@ -197,8 +197,8 @@ public ResponseEntity<Object> updateTaskByBoardId(
     }
 
     @PostMapping("/{id}/collabs/invitations")
-    public ResponseEntity<Object> createInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request, @RequestHeader(value = "Origin", required = false) String origin,Authentication authentication) throws MessagingException, UnsupportedEncodingException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(id, collab, request, origin,authentication));
+    public ResponseEntity<Object> createInvitation(@PathVariable String id, @Valid @RequestBody CollabRequestDTO collab, HttpServletRequest request, @RequestHeader(value = "Origin", required = false) String origin) throws MessagingException, UnsupportedEncodingException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(id, collab, request, origin));
     }
 
     @PatchMapping("/{id}/collabs/invitations/{oid}")
