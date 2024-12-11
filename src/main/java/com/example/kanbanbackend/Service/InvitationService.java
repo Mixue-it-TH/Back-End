@@ -85,7 +85,7 @@ public class InvitationService {
         return invitationResDTO;
     }
 
-    public InvitationResponseDTO createInvitation(String boardId, CollabRequestDTO collabRequestDTO, HttpServletRequest request, String origin, Authentication authentication) throws MessagingException, UnsupportedEncodingException {
+    public InvitationResponseDTO createInvitation(String boardId, CollabRequestDTO collabRequestDTO, HttpServletRequest request, String origin) throws MessagingException, UnsupportedEncodingException {
         Claims claims = claimsUtil.getClaims(request);
         String oid = (String) claims.get("oid");
 
@@ -113,8 +113,9 @@ public class InvitationService {
         }
 
         // CHECK THAT USER HAVE AUTHENTICATION
-        if (authentication != null && authentication.isAuthenticated()) {
-            user = fetchUserFromAzureAD(email, authentication);
+        String accessToken = request.getSession().getAttribute("accessToken").toString();
+        if (accessToken != null) {
+            user = fetchUserFromAzureAD(email, accessToken);
         }
 
         // CHECK THAT USER NOT IN DB
@@ -214,12 +215,7 @@ public class InvitationService {
         return result;
     }
 
-    public com.example.kanbanbackend.Entitites.Primary.User fetchUserFromAzureAD(String email, Authentication authentication) {
-        String accessToken = userService.getMicrosoftAccessToken(authentication);
-        if (accessToken == null) {
-            return null;
-        }
-
+    public com.example.kanbanbackend.Entitites.Primary.User fetchUserFromAzureAD(String email, String accessToken) {
         // Microsoft Graph API URL
         String url = "https://graph.microsoft.com/v1.0/users/" + email;
 

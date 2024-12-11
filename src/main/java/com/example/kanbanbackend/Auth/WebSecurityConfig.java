@@ -46,6 +46,7 @@ public class WebSecurityConfig {
                         .logoutSuccessHandler((request, response, authentication) -> {
                             // Must clear the session before redirecting to the logout URL
                             SecurityContextHolder.clearContext();
+                            request.changeSessionId();
 
                             String postLogoutRedirectUri = request.getQueryString();
                             String microsoftLogoutUrl = "https://login.microsoftonline.com/common/oauth2/logout";
@@ -53,6 +54,7 @@ public class WebSecurityConfig {
 
                             response.sendRedirect(redirectUrl);
                         })
+                        .invalidateHttpSession(true)
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults());

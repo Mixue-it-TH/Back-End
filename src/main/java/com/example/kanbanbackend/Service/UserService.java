@@ -10,6 +10,7 @@ import com.example.kanbanbackend.Exception.UnauthorizedException;
 import com.example.kanbanbackend.Repository.Primary.PrimaryUserRepository;
 import com.example.kanbanbackend.Repository.Share.UserRepository;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.context.SecurityContextHolder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;

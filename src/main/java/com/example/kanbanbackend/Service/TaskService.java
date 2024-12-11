@@ -283,17 +283,6 @@ public class TaskService {
     }
 
 
-    // Version 3
-
-
-    // old version
-//    public List<TaskBoardDTO>getTaskofBoard(String boardId, HttpServletRequest request) {
-//        List<Task> taskBoard = repository.findTaskByBoard_Id(boardId);
-//        return listMapper.mapList(taskBoard, TaskBoardDTO.class);
-//
-//    }
-
-
     //PBI 29 ใช้งานได้มั้ง
 
 
@@ -334,8 +323,10 @@ public class TaskService {
         // Set files in TaskSelectedDTO from Task's files
         List<FileDTO> fileDTOs = task.getFiles().stream()
                 .sorted(Comparator.comparing(File::getAddedOn))
-                .map(file -> new FileDTO(file.getId(), file.getName(), file.getUrl(), file.getSize()))
-                .collect(Collectors.toList());
+                .map(file -> {
+                    String presignedUrl = amazonS3Service.generatePresignedUrl(file.getUrl(), 5);
+                    return new FileDTO(file.getId(), file.getName(), presignedUrl, file.getSize());
+                })                .collect(Collectors.toList());
 
         dto.setFiles(fileDTOs);
 
@@ -381,17 +372,16 @@ public class TaskService {
                 if(file.getSize() > 20 * 1024 * 1024) {
                     continue;
                 }
-                // UPLOAD FILE TO CLOUDINARY
 
 
                 String nanoId = NanoId.generate(10);
 
-                URL result = amazonS3Service.uploadFile(file,fileName);
+                String fileKey = amazonS3Service.uploadFile(file,fileName);
                 // Create a new file
                 File newFile = new File();
                 newFile.setId(nanoId);
                 newFile.setName(fileName);
-                newFile.setUrl(result.toString());
+                newFile.setUrl(fileKey);
                 newFile.setTasks(taskBoard);
                 newFile.setSize((int) file.getSize());
                 filesToAdd.add(newFile);
